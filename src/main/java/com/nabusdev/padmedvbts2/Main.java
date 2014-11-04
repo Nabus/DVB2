@@ -1,13 +1,13 @@
 package com.nabusdev.padmedvbts2;
-import com.nabusdev.padmedvbts2.service.Database;
-import com.nabusdev.padmedvbts2.service.DatabaseLoader;
-import com.nabusdev.padmedvbts2.service.PropertiesLoader;
+import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
+import com.nabusdev.padmedvbts2.service.config.PropertiesLoader;
+import com.nabusdev.padmedvbts2.service.telnet.TelnetServer;
 
 public class Main {
 
     public static void main(String[] args) {
         PropertiesLoader.load("server");
-        Database.connect();
         DatabaseLoader.load();
+        TelnetServer.init();
     }
 }

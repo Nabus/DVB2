@@ -1,11 +1,10 @@
-package com.nabusdev.padmedvbts2.service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package com.nabusdev.padmedvbts2.util;
 import static com.nabusdev.padmedvbts2.util.Constants.*;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import java.sql.*;
 
 public class Database {
-
     private static Connection connection;
     private static Logger logger = LoggerFactory.getLogger(Database.class);
 

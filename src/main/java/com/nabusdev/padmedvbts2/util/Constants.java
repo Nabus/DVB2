@@ -1,5 +1,4 @@
 package com.nabusdev.padmedvbts2.util;
-import com.nabusdev.padmedvbts2.service.Variable;
 
 public class Constants {
     public static final String DB_USER = Variable.get("dbPort");
@@ -11,8 +10,15 @@ public class Constants {
     public static final String CONNECTION_LINK = "jdbc:" + DB_TYPE + "://" + DB_IP + ":" + DB_PORT + "/" + DB_TABLE;
     public static final String IDENTIFICATION = Variable.get("ident");
 
-    public class Table {
+    public class Telnet {
+        public static final int PORT = 12345;
 
+        public class Command {
+
+        }
+    }
+
+    public class Table {
         public class ServerSetup {
             public static final String IDENT = "ident";
             public static final String SETUP_KEY = "setup_key";

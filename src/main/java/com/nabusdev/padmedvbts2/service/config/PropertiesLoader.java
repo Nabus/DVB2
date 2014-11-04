@@ -1,4 +1,4 @@
-package com.nabusdev.padmedvbts2.service;
+package com.nabusdev.padmedvbts2.service.config;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

@@ -1,4 +1,4 @@
-package com.nabusdev.padmedvbts2.service;
+package com.nabusdev.padmedvbts2.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.HashMap;
@@ -19,6 +19,6 @@ public class Variable {
     }
 
     public static boolean exist(String key) {
-        return (variables.get(key) != null);
+        return variables.containsKey(key);
     }
 }
