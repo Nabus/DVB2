@@ -7,7 +7,7 @@ public class Main {
 
     public static void main(String[] args) {
         PropertiesLoader.load("server");
-        Database.init();
+        Database.connect();
         DatabaseLoader.load();
     }
 }
