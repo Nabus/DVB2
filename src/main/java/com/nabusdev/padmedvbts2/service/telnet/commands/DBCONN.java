@@ -1,5 +1,7 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
 
+import com.nabusdev.padmedvbts2.util.Database;
+
 public class DBCONN extends BaseTelnetCommand {
 
     public boolean execute() {
@@ -10,12 +12,15 @@ public class DBCONN extends BaseTelnetCommand {
     }
 
     private boolean renew() {
-        // TODO
+        Database.reconnect();
+        setAnswer("Reconnection..");
         return true;
     }
 
     private boolean status() {
-        // TODO
+        boolean isConnected = Database.isConnected();
+        if (isConnected) setAnswer("Connected");
+        else setAnswer("Not connected");
         return true;
     }
 }

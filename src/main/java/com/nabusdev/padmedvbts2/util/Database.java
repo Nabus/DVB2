@@ -41,4 +41,24 @@ public class Database {
         try { getStatement().executeUpdate(query); }
         catch (SQLException e) { e.printStackTrace(); }
     }
+
+    public static boolean isConnected() {
+        try {
+            return (connection.isClosed() == false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static void reconnect() {
+        try{
+            if (!connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        connect();
+    }
 }

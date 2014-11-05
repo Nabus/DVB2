@@ -1,4 +1,6 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
+import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
+import com.nabusdev.padmedvbts2.util.Variable;
 
 public class CONFIG extends BaseTelnetCommand {
 
@@ -10,12 +12,13 @@ public class CONFIG extends BaseTelnetCommand {
     }
 
     private boolean renew() {
-        // TODO
+        DatabaseLoader.load();
         return true;
     }
 
     private boolean status() {
-        // TODO
+        String lastReadTimestamp = Variable.get("lastConfigurationRead");
+        setAnswer(lastReadTimestamp);
         return true;
     }
 }

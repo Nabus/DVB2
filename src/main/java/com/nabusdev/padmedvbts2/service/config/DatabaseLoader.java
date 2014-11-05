@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,8 @@ public class DatabaseLoader extends ConfigLoader {
             String value = dbProperties.get(key);
             createVariable(key, value);
         }
+        final Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+        createVariable("lastConfigurationRead", currentTimestamp.toString());
     }
 
     private static Map<String, String> asMap(ResultSet resultSet) {
