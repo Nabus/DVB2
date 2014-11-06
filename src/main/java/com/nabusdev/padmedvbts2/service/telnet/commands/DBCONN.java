@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
-
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import com.nabusdev.padmedvbts2.util.Database;
 
 public class DBCONN extends BaseTelnetCommand {
@@ -12,13 +12,13 @@ public class DBCONN extends BaseTelnetCommand {
     }
 
     private boolean renew() {
-        Database.reconnect();
+        DatabaseProvider.configDB.reconnect();
         setAnswer("Reconnection..");
         return true;
     }
 
     private boolean status() {
-        boolean isConnected = Database.isConnected();
+        boolean isConnected = DatabaseProvider.configDB.isConnected();
         if (isConnected) setAnswer("Connected");
         else setAnswer("Not connected");
         return true;

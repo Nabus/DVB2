@@ -1,7 +1,8 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.*;
+import static com.nabusdev.padmedvbts2.util.Constants.Config.*;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.ServerSetup.*;
-import static com.nabusdev.padmedvbts2.util.Database.*;
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
@@ -17,14 +18,14 @@ public class DatabaseLoader extends ConfigLoader {
     public static void load() {
         String query = String.format("SELECT %s, %s FROM %s WHERE %s LIKE '%s';",
                 SETUP_KEY, SETUP_VALUE, DB_TABLE, IDENT, IDENTIFICATION);
-        ResultSet resultSet = selectSql(query);
+        ResultSet resultSet = DatabaseProvider.configDB.selectSql(query);
         Map<String, String> dbProperties = asMap(resultSet);
         for (String key : dbProperties.keySet()) {
             String value = dbProperties.get(key);
-            createVariable(key, value);
+            setVariable(key, value);
         }
         final Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-        createVariable("lastConfigurationRead", currentTimestamp.toString());
+        setVariable(LAST_CONFIGURATION_READ, currentTimestamp.toString());
     }
 
     private static Map<String, String> asMap(ResultSet resultSet) {

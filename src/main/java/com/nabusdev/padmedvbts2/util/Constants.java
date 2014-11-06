@@ -10,6 +10,25 @@ public class Constants {
     public static final String CONNECTION_LINK = "jdbc:" + DB_TYPE + "://" + DB_IP + ":" + DB_PORT + "/" + DB_TABLE;
     public static final String IDENTIFICATION = Variable.get("ident");
 
+    public static final String DB_MANAGER_CONNECTION_LINK = "jdbc:" + DB_TYPE + "://" +
+            Config.DB_MANAGER_HOST + ":" + Config.DB_MANAGER_PORT + "/" + Config.DB_MANAGER_DATABASE;
+
+    public class Config {
+        public static final String LAST_CONFIGURATION_READ = "lastConfigurationRead";
+
+        public static final String COMMAND_MANAGER_INTERFACE = "commandManagerInterface";
+        public static final String COMMAND_MANAGER_HOST = "commandManagerHost";
+        public static final String COMMAND_MANAGER_PORT = "commandManagerPort";
+        public static final String COMMAND_MANAGER_ALLOW_FROM = "commandManagerAllowFrom";
+        public static final String DB_MANAGER_HOST = "dbManagerHost";
+        public static final String DB_MANAGER_PORT = "dbManagerPort";
+        public static final String DB_MANAGER_USERNAME = "dbManagerUsername";
+        public static final String DB_MANAGER_PASSWORD = "dbManagerPassword";
+        public static final String DB_MANAGER_DATABASE = "dbManagerDatabase";
+        public static final String DB_MANAGER_PERIOD = "dbManagerPeriod";
+        public static final String DB_MANAGER_TIMEOUT = "dbManagerTimeout";
+    }
+
     public class Telnet {
         public static final int PORT = 12345;
 

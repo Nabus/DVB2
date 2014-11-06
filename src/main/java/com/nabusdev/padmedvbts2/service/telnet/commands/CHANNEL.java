@@ -43,8 +43,7 @@ public class CHANNEL extends BaseTelnetCommand {
     }
 
     private boolean outputRestart() {
-        // TODO
-        return true;
+        return (outputStart() && outputStop());
     }
 
     private boolean renew() {

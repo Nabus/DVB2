@@ -14,7 +14,7 @@ public class PropertiesLoader extends ConfigLoader {
             for (Object objectKey : properties.keySet()) {
                 String key = (String) objectKey;
                 String value = properties.getProperty(key);
-                createVariable(key, value);
+                setVariable(key, value);
             }
         } catch (IOException e) {
             e.printStackTrace();

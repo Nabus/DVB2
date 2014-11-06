@@ -1,17 +1,25 @@
 package com.nabusdev.padmedvbts2.util;
-import static com.nabusdev.padmedvbts2.util.Constants.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import java.sql.*;
 
 public class Database {
-    private static Connection connection;
-    private static Logger logger = LoggerFactory.getLogger(Database.class);
+    private String connectionLink;
+    private String dbUser;
+    private String dbPassword;
+    private Connection connection;
+    private Logger logger = LoggerFactory.getLogger(Database.class);
 
-    public static void connect(){
+    Database(String connectionLink, String dbUser, String dbPassword) {
+        this.connectionLink = connectionLink;
+        this.dbUser = dbUser;
+        this.dbPassword = dbPassword;
+    }
+
+    public void connect(){
         try {
             Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection(CONNECTION_LINK, DB_USER, DB_PASSWORD);
+            connection = DriverManager.getConnection(connectionLink, dbUser, dbPassword);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -19,7 +27,7 @@ public class Database {
         }
     }
 
-    private static Statement getStatement() {
+    private Statement getStatement() {
         try {
             if (connection.isClosed()) connect();
             return connection.createStatement();
@@ -30,19 +38,19 @@ public class Database {
         return null;
     }
 
-    public static ResultSet selectSql(String query) {
+    public ResultSet selectSql(String query) {
         try { return getStatement().executeQuery(query); }
         catch (SQLException e) { e.printStackTrace(); }
         logger.error("Failed to receive result from query '" + query + "'");
         return null;
     }
 
-    public static void resultSql(String query) {
+    public void resultSql(String query) {
         try { getStatement().executeUpdate(query); }
         catch (SQLException e) { e.printStackTrace(); }
     }
 
-    public static boolean isConnected() {
+    public boolean isConnected() {
         try {
             return (connection.isClosed() == false);
         } catch (SQLException e) {
@@ -51,7 +59,7 @@ public class Database {
         return false;
     }
 
-    public static void reconnect() {
+    public void reconnect() {
         try{
             if (!connection.isClosed()) {
                 connection.close();
