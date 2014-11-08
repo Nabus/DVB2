@@ -27,27 +27,44 @@ public class TelnetHandler extends IoHandlerAdapter {
     }
 
     public void messageReceived(IoSession session, Object message) {
-        String stringMessage = (String) message;
-        String command = stringMessage.split(" ")[0].toLowerCase();
-        try {
-            Object commandClass = Class.forName("com.nabusdev.padmedvbts2.service.telnet." + command).newInstance();
-            TelnetCommand telnetCommand = (TelnetCommand) commandClass;
-            final int WHITESPACE = 1;
-            String argument = stringMessage.substring(0, command.length() + WHITESPACE);
-            final boolean isExecuted = telnetCommand.perform(argument, session);
-            if (!isExecuted){
-                String answer = telnetCommand.getAnswer();
-                boolean gotAnswer = (answer != null);
-                if (gotAnswer) session.write(answer);
-                else throw new NoSuchAttributeException();
-            }
+        String parseResult[] = parseMessage(message);
+        final int COMMAND = 0, ARGUMENT = 1;
+        session.setAttribute("command", parseResult[COMMAND]);
+        session.setAttribute("argument", parseResult[ARGUMENT]);
+        MethodCollector.execute(session);
+        String answer = (String) session.getAttribute("answer");
+        if (answer != null){
+            session.write(answer);
+            return;
         }
-        catch (Exception e) {
-            unknownCommandReceived(session, stringMessage);
+        boolean isUnknownCommand = (boolean) session.getAttribute("isUnknownCommand");
+        if (isUnknownCommand) {
+            session.write("Unknown command '" + message + "'");
         }
     }
 
-    private void unknownCommandReceived(IoSession session, String message) {
-        session.write("Unknown command '" + message + "'");
+    private String[] parseMessage(Object message) {
+        String stringMessage = (String) message;
+        String[] messageSplit = stringMessage.split(" ");
+        String command;
+        String argument = "";
+        if (messageSplit.length > 1) {
+            final int OFFSET = 1;
+            argument = messageSplit[messageSplit.length - OFFSET];
+            StringBuilder commandBuilder = new StringBuilder();
+            int counter = 0;
+            for (String i : messageSplit) {
+                if (counter != 0) commandBuilder.append(" ");
+                if (counter != messageSplit.length - OFFSET) {
+                    commandBuilder.append(i);
+                    counter++;
+                }
+            }
+            command = commandBuilder.toString();
+        } else {
+            command = stringMessage;
+        }
+        command = command.toUpperCase();
+        return new String[]{command, argument};
     }
 }

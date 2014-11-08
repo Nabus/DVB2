@@ -1,7 +1,8 @@
 package com.nabusdev.padmedvbts2.service.telnet;
-import org.apache.mina.core.session.IoSession;
+import java.lang.annotation.*;
 
-public interface TelnetCommand {
-    boolean perform(String argument, IoSession session);
-    String getAnswer();
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface TelnetCommand {
+    String value();
 }

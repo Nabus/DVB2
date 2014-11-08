@@ -1,26 +1,21 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
+import com.nabusdev.padmedvbts2.service.telnet.CommandsCase;
+import com.nabusdev.padmedvbts2.service.telnet.TelnetCommand;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
-import com.nabusdev.padmedvbts2.util.Database;
+import org.apache.mina.core.session.IoSession;
 
-public class DBCONN extends BaseTelnetCommand {
+public class DbConn implements CommandsCase {
 
-    public boolean execute() {
-        setCommandsCount(1);
-        if (command.startsWith("RENEW")) return renew();
-        if (command.startsWith("STATUS")) return status();
-        return false;
-    }
-
-    private boolean renew() {
+    @TelnetCommand("DBCONN RENEW")
+    private void renew(IoSession session) {
         DatabaseProvider.configDB.reconnect();
-        setAnswer("Reconnection..");
-        return true;
+        session.setAttribute("answer", "Reconnection..");
     }
 
-    private boolean status() {
+    @TelnetCommand("DBCONN STATUS")
+    private void status(IoSession session) {
         boolean isConnected = DatabaseProvider.configDB.isConnected();
-        if (isConnected) setAnswer("Connected");
-        else setAnswer("Not connected");
-        return true;
+        if (isConnected) session.setAttribute("answer", "Connected");
+        else session.setAttribute("answer", "Not connected");
     }
 }

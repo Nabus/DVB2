@@ -1,63 +1,54 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
+import com.nabusdev.padmedvbts2.service.telnet.CommandsCase;
+import com.nabusdev.padmedvbts2.service.telnet.TelnetCommand;
+import org.apache.mina.core.session.IoSession;
 
-public class CHANNEL extends BaseTelnetCommand {
+public class Channel implements CommandsCase {
 
-    public boolean execute() {
-        setCommandsCount(2);
-        if (command.startsWith("INPUT START")) return inputStart();
-        if (command.startsWith("INPUT STOP")) return inputStop();
-        if (command.startsWith("INPUT RESTART")) return inputRestart();
-        if (command.startsWith("OUTPUT START")) return outputStart();
-        if (command.startsWith("OUTPUT STOP")) return outputStop();
-        if (command.startsWith("OUTPUT RESTART")) return outputRestart();
-        setCommandsCount(1);
-        if (command.startsWith("RENEW")) return renew();
-        if (command.startsWith("STATUS")) return status();
-        if (command.startsWith("ALLSTATUS")) return allstatus();
-        return false;
-    }
-
-    private boolean inputStart() {
+    @TelnetCommand("CHANNEL INPUT START")
+    private void inputStart(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean inputStop() {
+    @TelnetCommand("CHANNEL INPUT STOP")
+    private void inputStop(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean inputRestart() {
+    @TelnetCommand("CHANNEL INPUT RESTART")
+    private void inputRestart(IoSession session) {
+        inputStart(session);
+        inputStop(session);
+    }
+
+    @TelnetCommand("CHANNEL OUTPUT START")
+    private void outputStart(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean outputStart() {
+    @TelnetCommand("CHANNEL OUTPUT STOP")
+    private void outputStop(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean outputStop() {
+    @TelnetCommand("CHANNEL OUTPUT RESTART")
+    private void outputRestart(IoSession session) {
+        outputStart(session);
+        outputStop(session);
+    }
+
+    @TelnetCommand("CHANNEL RENEW")
+    private void renew(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean outputRestart() {
-        return (outputStart() && outputStop());
-    }
-
-    private boolean renew() {
+    @TelnetCommand("CHANNEL STATUS")
+    private void status(IoSession session) {
         // TODO
-        return true;
     }
 
-    private boolean status() {
+    @TelnetCommand("CHANNEL ALLSTATUS")
+    private void allstatus(IoSession session) {
         // TODO
-        return true;
-    }
-
-    private boolean allstatus() {
-        // TODO
-        return true;
     }
 }

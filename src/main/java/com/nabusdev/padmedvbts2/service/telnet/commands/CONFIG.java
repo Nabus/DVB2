@@ -1,25 +1,21 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
 import static com.nabusdev.padmedvbts2.util.Constants.Config.*;
 import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
+import com.nabusdev.padmedvbts2.service.telnet.CommandsCase;
+import com.nabusdev.padmedvbts2.service.telnet.TelnetCommand;
 import com.nabusdev.padmedvbts2.util.Variable;
+import org.apache.mina.core.session.IoSession;
 
-public class CONFIG extends BaseTelnetCommand {
+public class Config implements CommandsCase {
 
-    public boolean execute() {
-        setCommandsCount(1);
-        if (command.startsWith("RENEW")) return renew();
-        if (command.startsWith("STATUS")) return status();
-        return false;
-    }
-
-    private boolean renew() {
+    @TelnetCommand("CONFIG RENEW")
+    private void renew(IoSession session) {
         DatabaseLoader.load();
-        return true;
     }
 
-    private boolean status() {
+    @TelnetCommand("CONFIG STATUS")
+    private void status(IoSession session) {
         String lastReadTimestamp = Variable.get(LAST_CONFIGURATION_READ);
-        setAnswer(lastReadTimestamp);
-        return true;
+        session.setAttribute("answer", lastReadTimestamp);
     }
 }
