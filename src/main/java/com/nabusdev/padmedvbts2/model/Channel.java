@@ -6,11 +6,11 @@ public class Channel {
     private Adapter adapter;
     private int pnrId;
     private String thumbPath;
-    private String thumbFilePattern;
-    private int thumbGenerateInterval = 15000;
-    private String thumbImageFormat = "JPEG";
+    private String thumbFilenamePattern;
+    private int thumbSavePeriod = 15000;
+    private String thumbSaveFormat = "JPEG";
 
-    Channel(String name, String ident, Adapter adapter, int pnrId) {
+    public Channel(String name, String ident, Adapter adapter, int pnrId) {
         this.name = name;
         this.ident = ident;
         this.adapter = adapter;
@@ -21,27 +21,15 @@ public class Channel {
         this.thumbPath = thumbPath;
     }
 
-    public void setThumbFilePattern(String thumbFilePattern) {
-        this.thumbFilePattern = thumbFilePattern;
+    public void setThumbFilenamePattern(String thumbFilenamePattern) {
+        this.thumbFilenamePattern = thumbFilenamePattern;
     }
 
-    public void setThumbGenerateInterval(int thumbGenerateInterval) {
-        this.thumbGenerateInterval = thumbGenerateInterval;
+    public void setThumbSavePeriod(int thumbSavePeriod) {
+        this.thumbSavePeriod = thumbSavePeriod;
     }
 
-    public void setThumbImageFormat(String thumbImageFormat) {
-        this.thumbImageFormat = thumbImageFormat;
-    }
-
-    public void startUse() {
-
-    }
-
-    public void stopUse() {
-
-    }
-
-    public void errorOccurred(String errorMessage) {
-
+    public void setThumbSaveFormat(String thumbSaveFormat) {
+        this.thumbSaveFormat = thumbSaveFormat;
     }
 }

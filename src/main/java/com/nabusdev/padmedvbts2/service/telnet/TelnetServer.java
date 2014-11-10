@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.service.telnet;
-import static com.nabusdev.padmedvbts2.util.Constants.Config.*;
+import static com.nabusdev.padmedvbts2.util.Constants.Table.ServerSetup.*;
 import com.nabusdev.padmedvbts2.util.Variable;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
