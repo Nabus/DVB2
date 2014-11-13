@@ -35,6 +35,14 @@ public class Client {
         return null;
     }
 
+    public DataInputStream getDataInputStream(){
+        return dataInputStream;
+    }
+
+    public DataOutputStream getDataOutputStream(){
+        return dataOutputStream;
+    }
+
     private void addToList() {
         clients.put(getId(), this);
     }

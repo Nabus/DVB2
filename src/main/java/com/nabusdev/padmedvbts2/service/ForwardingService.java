@@ -13,11 +13,25 @@ import java.net.SocketException;
 
 public class ForwardingService {
     private static Logger logger = LoggerFactory.getLogger(ForwardingService.class);
+    private static final ForwardingService INSTANCE = new ForwardingService();
     private static final int TEMP_PORT = 27000;
     private static final int TIMEOUT_SEC = 25;
-    public void init() {
+
+    private ForwardingService() {
+
+    }
+
+    public static ForwardingService getInstance() {
+        return INSTANCE;
+    }
+
+    public static void init() {
+        getInstance().initHandler();
+    }
+
+    public void initHandler() {
         try (ServerSocket network = new ServerSocket(TEMP_PORT)){
-            logger.info("Accepting connections at port " + port);
+            logger.info("Accepting connections at port " + TEMP_PORT);
             while (true){
                 new Thread(new Channel(network.accept())).start();
             }
@@ -55,7 +69,7 @@ public class ForwardingService {
                     catch (Exception e){
                         timeoutCount++;
                         if (timeoutCount == TIMEOUT_SEC){
-                            dropChannel(channel, DisconnectReason.TIMEOUT);
+                            dropChannel(channel);
                         }
                     }
                 }
@@ -79,7 +93,8 @@ public class ForwardingService {
             while (!channel.isClosed()){
                 try {
                     inStreamData = inStream.readUTF();
-                    PacketParser.parseNetworkPacket(client, inStreamData);
+                    // todo
+                    //PacketParser.parseNetworkPacket(client, inStreamData);
                 }
                 catch (Exception e) {/* Ignoring "Connection Reset" Exception */}
             }
@@ -96,12 +111,7 @@ public class ForwardingService {
         catch (IOException e) {e.printStackTrace();}
     }
 
-    public static void dropChannel(Socket channel, DisconnectReason reason){
-        Client client = Client.getClient(channel);
-        fireClientDisconnectEvent(client, reason);
-        client.clientDisconnected();
-        AbstractClient abstractClient = AbstractClient.getAbstractClient(client);
-        if (abstractClient != null) abstractClient.abstractClientDropped();
+    public static void dropChannel(Socket channel){
         try {channel.close();}
         catch (IOException e) {e.printStackTrace();}
     }
