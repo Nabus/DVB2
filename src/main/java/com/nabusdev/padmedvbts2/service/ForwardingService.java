@@ -11,7 +11,27 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ForwardingService {
+public class ForwardingService implements Runnable{
+    private Channel channel;
+
+    ForwardingService(Channel channel) {
+        this.channel = channel;
+    }
+
+    public void run() {
+
+    }
+
+
+
+
+
+
+
+
+
+
+
     private static Logger logger = LoggerFactory.getLogger(ForwardingService.class);
     private static final ForwardingService INSTANCE = new ForwardingService();
     private static final int TEMP_PORT = 27000;

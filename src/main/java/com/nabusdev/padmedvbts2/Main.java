@@ -2,6 +2,7 @@ package com.nabusdev.padmedvbts2;
 import com.nabusdev.padmedvbts2.service.ForwardingService;
 import com.nabusdev.padmedvbts2.service.config.ChannelLoader;
 import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
+import com.nabusdev.padmedvbts2.service.config.ForwardLoader;
 import com.nabusdev.padmedvbts2.service.config.PropertiesLoader;
 import com.nabusdev.padmedvbts2.service.telnet.TelnetServer;
 
@@ -12,6 +13,7 @@ public class Main {
         DatabaseLoader.load();
         TelnetServer.init();
         ChannelLoader.load();
+        ForwardLoader.load();
         ForwardingService.init();
     }
 }

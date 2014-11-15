@@ -1,5 +1,7 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.Channels.*;
+
+import com.nabusdev.padmedvbts2.service.GetStreamInit;
 import com.nabusdev.padmedvbts2.util.Constants.Table.*;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
@@ -14,19 +16,20 @@ public class ChannelLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
 
     public static void load() {
-        String query = String.format("SELECT " + ADAPTER_ID + "," + NAME + "," + IDENT + "," + PNR + "," +
+        String query = String.format("SELECT " + ID + "," + ADAPTER_ID + "," + NAME + "," + IDENT + "," + PNR + "," +
                 THUMB_SAVE_PATH + "," + THUMB_SAVE_FILENAME_PATTERN + "," + THUMB_SAVE_PERIOD + "," +
                 THUMB_SAVE_FORMAT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
 
         ResultSet resultSet = db.selectSql(query);
         List<Channel> channels = getChannels(resultSet);
-        // Todo: process channels
+        GetStreamInit.init(channels);
     }
 
     private static List<Channel> getChannels(ResultSet resultSet) {
         List<Channel> channels = new ArrayList<>();
         try {
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 int adapterId = resultSet.getInt(ADAPTER_ID);
                 String name = resultSet.getString(NAME);
                 String ident = resultSet.getString(IDENT);
@@ -39,7 +42,7 @@ public class ChannelLoader {
                 if (adapter == null) adapter = createAdapter(adapterId);
                 boolean isAdapterFoundAndActive = (adapter != null);
                 if (isAdapterFoundAndActive) {
-                    Channel channel = new Channel(name, ident, adapter, pnr);
+                    Channel channel = new Channel(id, name, ident, adapter, pnr);
                     channel.setThumbPath(thumbSavePath);
                     channel.setThumbFilenamePattern(thumbSaveFilenamePattern);
                     channel.setThumbSavePeriod(thumbSavePeriod);

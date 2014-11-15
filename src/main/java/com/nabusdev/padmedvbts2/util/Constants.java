@@ -53,6 +53,7 @@ public class Constants {
 
         public class Channels {
             public static final String TABLE_NAME = "channels";
+            public static final String ID = "ID";
             public static final String ADAPTER_ID = "adapter_id";
             public static final String NAME = "name";
             public static final String IDENT = "ident";
@@ -70,6 +71,7 @@ public class Constants {
 
         public class Adapters {
             public static final String TABLE_NAME = "adapters";
+            public static final String ID = "ID";
             public static final String IDENT = "ident";
             public static final String PATH = "path";
             public static final String ADAPTER_TYPE = "adapter_type";
@@ -83,6 +85,27 @@ public class Constants {
             public static final String DATE_STOP = "date_stop";
             public static final String DATE_FAILED = "date_failed";
             public static final String FAILED_MESSAGE = "failed_message";
+            public static final String ACTIVE = "active";
+        }
+
+        public class StreamForward {
+            public static final String TABLE_NAME = "stream_forward";
+            public static final String ID = "ID";
+            public static final String CHANNEL_ID = "channel_id";
+            public static final String EVENT_TYPE = "event_type";
+            public static final String OUTPUT_STREAM_PROTOCOL = "output_stream_protocol";
+            public static final String OUTPUT_STREAM_HOST = "output_stream_host";
+            public static final String OUTPUT_STREAM_PORT = "output_stream_port";
+            public static final String OUTPUT_STREAM_USERNAME = "output_stream_username";
+            public static final String OUTPUT_STREAM_PASSWORD = "output_stream_password";
+            public static final String OUTPUT_STREAM_URL_PATH = "output_stream_url_path";
+            public static final String OUTPUT_STREAM_TIMEOUT = "output_stream_client_limit";
+            public static final String OUTPUT_STREAM_CLIENT_LIMIT = "date_streaming_start";
+            public static final String DATA_STREAMING_START = "date_streaming_start";
+            public static final String DATA_STREAMING_STOP = "date_streaming_stop";
+            public static final String DATA_STREAMING_FAILED = "date_streaming_failed";
+            public static final String STREAMING_FAILED_MESSAGE = "streaming_failed_message";
+            public static final String CONNECTION_ATTEMPTS = "connection_attempts";
             public static final String ACTIVE = "active";
         }
     }
