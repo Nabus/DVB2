@@ -18,7 +18,6 @@ public class ForwardLoader {
 
         ResultSet resultSet = db.selectSql(query);
         linkForwardsToChannels(resultSet);
-
     }
 
     private static void linkForwardsToChannels(ResultSet resultSet) {

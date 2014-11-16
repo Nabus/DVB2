@@ -47,6 +47,7 @@ public class ChannelLoader {
                     channel.setThumbFilenamePattern(thumbSaveFilenamePattern);
                     channel.setThumbSavePeriod(thumbSavePeriod);
                     channel.setThumbSaveFormat(thumbSaveFormat);
+                    adapter.addChannel(channel);
                     channels.add(channel);
                 }
             }

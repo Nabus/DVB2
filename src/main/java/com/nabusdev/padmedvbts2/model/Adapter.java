@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 public class Adapter {
-    private static Map<Integer, Adapter> adapters = new HashMap<>();
     private int id;
     private String path;
     private String ident;
@@ -15,6 +14,8 @@ public class Adapter {
     private String transmissionMode;
     private String guardInterval;
     private String hierarchy;
+    private List<Channel> channels = new ArrayList<>();
+    private static Map<Integer, Adapter> adapters = new HashMap<>();
 
     public Adapter(int id, String ident, String path) {
        this.id = id;
@@ -25,6 +26,18 @@ public class Adapter {
 
     public static Adapter getById(int id) {
         return adapters.get(id);
+    }
+
+    public static List<Adapter> getAdapterList() {
+        List<Adapter> adapterList = new ArrayList<>();
+        for (Adapter adapter : adapters.values()) {
+            adapterList.add(adapter);
+        }
+        return adapterList;
+    }
+
+    public void addChannel(Channel channel) {
+        channels.add(channel);
     }
 
     public void setAdapterType(String adapterType) {
@@ -49,5 +62,25 @@ public class Adapter {
 
     public void setHierarchy(String hierarchy) {
         this.hierarchy = hierarchy;
+    }
+
+    public int getId(){
+        return id;
+    }
+
+    public String getAdapterType() {
+        return adapterType;
+    }
+
+    public List<Channel> getChannels() {
+        return channels;
+    }
+
+    public int getBandwidth() {
+        return bandwidth;
+    }
+
+    public int getFrequency() {
+        return frequency;
     }
 }
