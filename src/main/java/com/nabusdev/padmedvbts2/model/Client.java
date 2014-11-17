@@ -15,8 +15,8 @@ public class Client {
     private static volatile int clientLastID = 0;
     private Map<Integer, Client> clients = new HashMap<>();
 
-    public Client(Socket sChannel) {
-        this.channel = sChannel;
+    public Client(Socket channel) {
+        this.channel = channel;
         this.dataInputStream = createDataInputStream();
         this.dataOutputStream = createDataOutputStream();
         clientID = ++clientLastID;

@@ -32,6 +32,14 @@ public class Channel {
         return channels.get(id);
     }
 
+    public static List<Channel> getChannelList() {
+        List<Channel> channelList = new ArrayList<>();
+        for (Channel channel : channels.values()) {
+            channelList.add(channel);
+        }
+        return channelList;
+    }
+
     public void addForward(Forward forward) {
         forwards.add(forward);
     }

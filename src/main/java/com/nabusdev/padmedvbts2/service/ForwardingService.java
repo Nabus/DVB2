@@ -1,138 +1,67 @@
 package com.nabusdev.padmedvbts2.service;
+import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Client;
+import com.nabusdev.padmedvbts2.model.Forward;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.BindException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
+import java.net.UnknownHostException;
 
-public class ForwardingService implements Runnable{
-    private Channel channel;
-
-    ForwardingService(Channel channel) {
-        this.channel = channel;
-    }
-
-    public void run() {
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-    private static Logger logger = LoggerFactory.getLogger(ForwardingService.class);
+public class ForwardingService {
+    private static final String HARDCODED_PORT = "27015";
+    private static final String HARDCODED_IP = "192.168.1.7";
     private static final ForwardingService INSTANCE = new ForwardingService();
-    private static final int TEMP_PORT = 27000;
-    private static final int TIMEOUT_SEC = 25;
-
-    private ForwardingService() {
-
-    }
-
-    public static ForwardingService getInstance() {
-        return INSTANCE;
-    }
+    private static Logger logger = LoggerFactory.getLogger(ForwardingService.class);
 
     public static void init() {
-        getInstance().initHandler();
-    }
-
-    public void initHandler() {
-        try (ServerSocket network = new ServerSocket(TEMP_PORT)){
-            logger.info("Accepting connections at port " + TEMP_PORT);
-            while (true){
-                new Thread(new Channel(network.accept())).start();
-            }
-        }
-        catch (BindException e){
-            logger.error("Failed to bind port " + TEMP_PORT);
-            logger.error(e.getMessage());
-            System.exit(1);
-        }
-        catch (IOException e) {e.printStackTrace();}
-    }
-
-    class Channel implements Runnable {
-        private Client client;
-        private Socket channel;
-        private int timeoutCount = 0;
-
-        public Channel(Socket channel){
-            this.client = new Client(channel);
-            this.channel = channel;
-        }
-
-        public void run(){
-            new Thread(new ChannelListen(client, channel)).start();
-            try{
-                DataOutputStream disOut = client.getDataOutputStream();
-                while (!channel.isClosed()){
-                    try {Thread.sleep(1000);}
-                    catch (Exception e) {e.printStackTrace();}
-                    try {
-                        disOut.writeByte(0);
-                        disOut.flush();
-                        timeoutCount = 0;
-                    }
-                    catch (Exception e){
-                        timeoutCount++;
-                        if (timeoutCount == TIMEOUT_SEC){
-                            dropChannel(channel);
-                        }
-                    }
+        for (Channel channel : Channel.getChannelList()) {
+            for (Forward forward : channel.getForwards()) {
+                String protocol = forward.getOutputStreamProtocol();
+                if (protocol.equals("HTTP")) {
+                    INSTANCE.startHttpServer(channel, forward);
+                } else {
+                    logger.warn("Forward skipped, only HTTP supported");
                 }
             }
-            catch (Exception e) {e.printStackTrace();}
         }
     }
 
-    class ChannelListen implements Runnable{
-        private Socket channel;
-        private Client client;
+    private void startHttpServer(Channel channel, Forward forward) {
+        new Thread(new HttpServer(forward)).start();
+    }
 
-        public ChannelListen(Client client, Socket channel){
-            this.channel = channel;
-            this.client = client;
+    class HttpServer implements Runnable {
+        private Forward forward;
+
+        HttpServer(Forward forward) {
+            this.forward = forward;
         }
 
-        public void run(){
-            String inStreamData;
-            DataInputStream inStream = client.getDataInputStream();
-            while (!channel.isClosed()){
-                try {
-                    inStreamData = inStream.readUTF();
-                    // todo
-                    //PacketParser.parseNetworkPacket(client, inStreamData);
+        public void run() {
+            int port = forward.getOutputStreamPort();
+            InetAddress host;
+            try { host = InetAddress.getByName(forward.getOutputStreamHost()); }
+            catch (UnknownHostException e) {
+                logger.error("Can't bind IP/Host address " + forward.getOutputStreamHost());
+                e.printStackTrace();
+                return;
+            }
+
+            final int BACKLOG = 0;
+            try (ServerSocket network = new ServerSocket(port, BACKLOG, host)) {
+                while (true) {
+                    Socket socket = network.accept();
+                    Client client = new Client(socket);
+                    Channel channel = forward.getChannel();
+                    ForwardingHandler.connect(client, channel);
                 }
-                catch (Exception e) {/* Ignoring "Connection Reset" Exception */}
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-    }
-
-    public static void sendPacket(Client client, String packet){
-        try{
-            DataOutputStream outputStream = client.getDataOutputStream();
-            outputStream.writeUTF(packet);
-            outputStream.flush();
-        }
-        catch (SocketException e) {/* Ignoring "Socket Write Error" Exception */}
-        catch (IOException e) {e.printStackTrace();}
-    }
-
-    public static void dropChannel(Socket channel){
-        try {channel.close();}
-        catch (IOException e) {e.printStackTrace();}
     }
 }

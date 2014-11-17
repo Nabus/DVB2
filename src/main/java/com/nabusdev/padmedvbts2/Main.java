@@ -16,6 +16,6 @@ public class Main {
         ChannelLoader.load();
         ForwardLoader.load();
         StreamingService.init();
-
+        ForwardingService.init();
     }
 }

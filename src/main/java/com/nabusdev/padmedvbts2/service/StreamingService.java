@@ -2,6 +2,7 @@ package com.nabusdev.padmedvbts2.service;
 import com.nabusdev.padmedvbts2.Main;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
+import com.nabusdev.padmedvbts2.model.InnerStream;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.slf4j.Logger;
@@ -11,9 +12,9 @@ import java.io.PrintWriter;
 import java.security.CodeSource;
 
 public class StreamingService {
-    private static final String HARDCODED_PORT = "27015";
-    private static final String HARDCODED_IP = "192.168.1.7";
-    private static final String HARDCODED_PID = "201 202 203";
+    private static final String innerIp = "127.0.0.1";
+    private static int innerPort = 27000;
+    private static int innerPid = 200;
     private static final String CONFIG_NAME = "stream%d.conf";
     private static final StreamingService INSTANCE = new StreamingService();
     private static Logger logger = LoggerFactory.getLogger(StreamingService.class);
@@ -38,15 +39,16 @@ public class StreamingService {
         writer.println("bandwidth=" + adapter.getBandwidth() + "MHz");
         writer.println("delivery_system=" + adapter.getAdapterType());
         writer.println("unicast=1");
-        writer.println("unicast_ip=" + HARDCODED_IP);
-        writer.println("unicast_port=" + HARDCODED_PORT);
+        writer.println("unicast_ip=" + innerIp);
+        writer.println("unicast_port=" + innerPort);
 
         for (Channel channel : adapter.getChannels()) {
             writer.println("new_channel");
             writer.println("name=" + channel.getName());
-            writer.println("ip=" + HARDCODED_IP);
-            writer.println("port=" + HARDCODED_PORT);
-            writer.println("pids=" + HARDCODED_PID);
+            writer.println("ip=" + innerIp);
+            writer.println("port=" + ++innerPort);
+            writer.println("pids=" + ++innerPid);
+            new InnerStream(channel, innerIp, innerPort);
         }
         writer.close();
     }

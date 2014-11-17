@@ -1,7 +1,5 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.Channels.*;
-
-import com.nabusdev.padmedvbts2.service.GetStreamInit;
 import com.nabusdev.padmedvbts2.util.Constants.Table.*;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
@@ -9,8 +7,6 @@ import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ChannelLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
@@ -21,12 +17,10 @@ public class ChannelLoader {
                 THUMB_SAVE_FORMAT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
 
         ResultSet resultSet = db.selectSql(query);
-        List<Channel> channels = getChannels(resultSet);
-        GetStreamInit.init(channels);
+        attachChannels(resultSet);
     }
 
-    private static List<Channel> getChannels(ResultSet resultSet) {
-        List<Channel> channels = new ArrayList<>();
+    private static void attachChannels(ResultSet resultSet) {
         try {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -48,13 +42,11 @@ public class ChannelLoader {
                     channel.setThumbSavePeriod(thumbSavePeriod);
                     channel.setThumbSaveFormat(thumbSaveFormat);
                     adapter.addChannel(channel);
-                    channels.add(channel);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return channels;
     }
 
     private static Adapter createAdapter(int adapterId) {

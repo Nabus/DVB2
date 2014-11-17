@@ -9,13 +9,13 @@ public class DbConn implements CommandsCase {
 
     @TelnetCommand(DBCONN_RENEW)
     private void renew(IoSession session) {
-        DatabaseProvider.configDB.reconnect();
+        DatabaseProvider.getConfigDB().reconnect();
         session.setAttribute("answer", "Reconnection..");
     }
 
     @TelnetCommand(DBCONN_STATUS)
     private void status(IoSession session) {
-        boolean isConnected = DatabaseProvider.configDB.isConnected();
+        boolean isConnected = DatabaseProvider.getConfigDB().isConnected();
         if (isConnected) session.setAttribute("answer", "Connected");
         else session.setAttribute("answer", "Not connected");
     }
