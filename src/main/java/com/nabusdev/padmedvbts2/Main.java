@@ -1,21 +1,17 @@
 package com.nabusdev.padmedvbts2;
-import com.nabusdev.padmedvbts2.service.ForwardingService;
-import com.nabusdev.padmedvbts2.service.StreamingService;
-import com.nabusdev.padmedvbts2.service.config.ChannelLoader;
-import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
-import com.nabusdev.padmedvbts2.service.config.ForwardLoader;
-import com.nabusdev.padmedvbts2.service.config.PropertiesLoader;
 import com.nabusdev.padmedvbts2.service.telnet.TelnetServer;
+import com.nabusdev.padmedvbts2.service.config.*;
+import com.nabusdev.padmedvbts2.service.*;
 
 public class Main {
 
     public static void main(String[] args) {
         PropertiesLoader.load("server");
         DatabaseLoader.load();
-        TelnetServer.init();
+        AdapterLoader.load();
         ChannelLoader.load();
         ForwardLoader.load();
-        StreamingService.init();
-        ForwardingService.init();
+        StreamService.init();
+        TelnetServer.init();
     }
 }

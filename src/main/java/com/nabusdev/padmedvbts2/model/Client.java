@@ -13,7 +13,7 @@ public class Client {
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
     private static volatile int clientLastID = 0;
-    private Map<Integer, Client> clients = new HashMap<>();
+    private static Map<Integer, Client> clients = new HashMap<>();
 
     public Client(Socket channel) {
         this.channel = channel;
@@ -21,6 +21,10 @@ public class Client {
         this.dataOutputStream = createDataOutputStream();
         clientID = ++clientLastID;
         this.addToList();
+    }
+
+    private void addToList() {
+        clients.put(getId(), this);
     }
 
     private DataInputStream createDataInputStream(){
@@ -41,10 +45,6 @@ public class Client {
 
     public DataOutputStream getDataOutputStream(){
         return dataOutputStream;
-    }
-
-    private void addToList() {
-        clients.put(getId(), this);
     }
 
     public int getId(){

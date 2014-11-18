@@ -1,4 +1,6 @@
 package com.nabusdev.padmedvbts2.model;
+import com.nabusdev.padmedvbts2.service.ForwardingProcess;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ public class Channel {
     private String thumbFilenamePattern;
     private int thumbSavePeriod = 15000;
     private String thumbSaveFormat = "JPEG";
-    private InputStream inputStream = null;
+    private Stream stream;
     private List<Forward> forwards = new ArrayList<>();
     private static Map<Integer, Channel> channels = new HashMap<>();
 
@@ -52,10 +54,6 @@ public class Channel {
         return name;
     }
 
-    public void setInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
     public void setThumbPath(String thumbPath) {
         this.thumbPath = thumbPath;
     }
@@ -70,5 +68,29 @@ public class Channel {
 
     public void setThumbSaveFormat(String thumbSaveFormat) {
         this.thumbSaveFormat = thumbSaveFormat;
+    }
+
+    public String getThumbSaveFormat() {
+        return thumbSaveFormat;
+    }
+
+    public String getThumbPath() {
+        return thumbPath;
+    }
+
+    public String getThumbFilenamePattern() {
+        return thumbFilenamePattern;
+    }
+
+    public int getThumbSavePeriod() {
+        return thumbSavePeriod;
+    }
+
+    public Stream getStream() {
+        return stream;
+    }
+
+    public void setStream(Stream stream) {
+        this.stream = stream;
     }
 }

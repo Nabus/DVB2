@@ -2,7 +2,7 @@ package com.nabusdev.padmedvbts2.service;
 import com.nabusdev.padmedvbts2.Main;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
-import com.nabusdev.padmedvbts2.model.InnerStream;
+import com.nabusdev.padmedvbts2.model.Stream;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.slf4j.Logger;
@@ -11,13 +11,13 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.security.CodeSource;
 
-public class StreamingService {
+public class StreamInitialization {
     private static final String innerIp = "127.0.0.1";
     private static int innerPort = 27000;
     private static int innerPid = 200;
     private static final String CONFIG_NAME = "stream%d.conf";
-    private static final StreamingService INSTANCE = new StreamingService();
-    private static Logger logger = LoggerFactory.getLogger(StreamingService.class);
+    private static final StreamInitialization INSTANCE = new StreamInitialization();
+    private static Logger logger = LoggerFactory.getLogger(StreamInitialization.class);
 
     public static void init() {
         for (Adapter adapter : Adapter.getAdapterList()) {
@@ -48,7 +48,8 @@ public class StreamingService {
             writer.println("ip=" + innerIp);
             writer.println("port=" + ++innerPort);
             writer.println("pids=" + ++innerPid);
-            new InnerStream(channel, innerIp, innerPort);
+            Stream stream = new Stream(channel, innerIp, innerPort);
+            new ForwardingProcess(stream);
         }
         writer.close();
     }

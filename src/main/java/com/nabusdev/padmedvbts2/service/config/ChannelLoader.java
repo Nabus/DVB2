@@ -1,15 +1,17 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.Channels.*;
-import com.nabusdev.padmedvbts2.util.Constants.Table.*;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ChannelLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
+    private static Logger logger = LoggerFactory.getLogger(ChannelLoader.class);
 
     public static void load() {
         String query = String.format("SELECT " + ID + "," + ADAPTER_ID + "," + NAME + "," + IDENT + "," + PNR + "," +
@@ -17,13 +19,13 @@ public class ChannelLoader {
                 THUMB_SAVE_FORMAT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
 
         ResultSet resultSet = db.selectSql(query);
-        attachChannels(resultSet);
+        linkChannelsToAdapters(resultSet);
     }
 
-    private static void attachChannels(ResultSet resultSet) {
+    private static void linkChannelsToAdapters(ResultSet resultSet) {
         try {
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
+                int id = resultSet.getInt(ID);
                 int adapterId = resultSet.getInt(ADAPTER_ID);
                 String name = resultSet.getString(NAME);
                 String ident = resultSet.getString(IDENT);
@@ -33,7 +35,6 @@ public class ChannelLoader {
                 int thumbSavePeriod = resultSet.getInt(THUMB_SAVE_PERIOD);
                 String thumbSaveFormat = resultSet.getString(THUMB_SAVE_FORMAT);
                 Adapter adapter = Adapter.getById(adapterId);
-                if (adapter == null) adapter = createAdapter(adapterId);
                 boolean isAdapterFoundAndActive = (adapter != null);
                 if (isAdapterFoundAndActive) {
                     Channel channel = new Channel(id, name, ident, adapter, pnr);
@@ -42,43 +43,12 @@ public class ChannelLoader {
                     channel.setThumbSavePeriod(thumbSavePeriod);
                     channel.setThumbSaveFormat(thumbSaveFormat);
                     adapter.addChannel(channel);
+                } else {
+                    logger.error("Can't find active adapter id " + adapterId + "for channel id " + id);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private static Adapter createAdapter(int adapterId) {
-        String query = String.format("SELECT " + Adapters.IDENT + "," + Adapters.PATH + "," +
-                Adapters.ADAPTER_TYPE + "," + Adapters.FREQUENCY + "," + Adapters.BANDWIDTH + "," +
-                Adapters.TRANSMISSION_MODE + "," + Adapters.GUARD_INTERVAL + "," + Adapters.HIERARCHY +
-                Adapters.MODULATION + " FROM " + Adapters.TABLE_NAME + " WHERE " + ACTIVE + " = 1 AND id = " +
-                adapterId + ";");
-
-        ResultSet resultSet = db.selectSql(query);
-        Adapter adapter = null;
-        try {
-            while (resultSet.next()) {
-                String ident = resultSet.getString(Adapters.IDENT);
-                String path = resultSet.getString(Adapters.PATH);
-                String adapterType = resultSet.getString(Adapters.ADAPTER_TYPE);
-                int frequency = resultSet.getInt(Adapters.FREQUENCY);
-                int bandwidth = resultSet.getInt(Adapters.BANDWIDTH);
-                String transmissionMode = resultSet.getString(Adapters.TRANSMISSION_MODE);
-                String guardInterval = resultSet.getString(Adapters.GUARD_INTERVAL);
-                String hierarchy = resultSet.getString(Adapters.HIERARCHY);
-                adapter = new Adapter(adapterId, ident, path);
-                adapter.setAdapterType(adapterType);
-                adapter.setFrequency(frequency);
-                adapter.setBandwidth(bandwidth);
-                adapter.setTransmissionMode(transmissionMode);
-                adapter.setGuardInterval(guardInterval);
-                adapter.setHierarchy(hierarchy);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return adapter;
     }
 }

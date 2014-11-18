@@ -4,17 +4,21 @@ import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Forward;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ForwardLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
+    private static Logger logger = LoggerFactory.getLogger(ForwardLoader.class);
 
     public static void load() {
-        String query = String.format("SELECT " + CHANNEL_ID + "," + EVENT_TYPE + "," + OUTPUT_STREAM_PROTOCOL + "," +
-                OUTPUT_STREAM_HOST + "," + OUTPUT_STREAM_PORT + "," + OUTPUT_STREAM_USERNAME + "," +
-                OUTPUT_STREAM_PASSWORD + "," + OUTPUT_STREAM_URL_PATH + "," + OUTPUT_STREAM_TIMEOUT + "," +
-                OUTPUT_STREAM_CLIENT_LIMIT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
+        String query = String.format("SELECT " + ID + "," + CHANNEL_ID + "," + EVENT_TYPE + "," +
+                OUTPUT_STREAM_PROTOCOL + "," + OUTPUT_STREAM_HOST + "," + OUTPUT_STREAM_PORT + "," +
+                OUTPUT_STREAM_USERNAME + "," + OUTPUT_STREAM_PASSWORD + "," + OUTPUT_STREAM_URL_PATH + "," +
+                OUTPUT_STREAM_TIMEOUT + "," + OUTPUT_STREAM_CLIENT_LIMIT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
 
         ResultSet resultSet = db.selectSql(query);
         linkForwardsToChannels(resultSet);
@@ -23,6 +27,7 @@ public class ForwardLoader {
     private static void linkForwardsToChannels(ResultSet resultSet) {
         try {
             while (resultSet.next()) {
+                int id = resultSet.getInt(ID);
                 int channelId = resultSet.getInt(CHANNEL_ID);
                 String eventType = resultSet.getString(EVENT_TYPE);
                 String outputStreamProtocol = resultSet.getString(OUTPUT_STREAM_PROTOCOL);
@@ -34,8 +39,9 @@ public class ForwardLoader {
                 int outputStreamTimeout = resultSet.getInt(OUTPUT_STREAM_TIMEOUT);
                 int outputStreamClientLimit = resultSet.getInt(OUTPUT_STREAM_CLIENT_LIMIT);
                 Channel channel = Channel.getById(channelId);
-                if (channel != null) {
-                    Forward forward = new Forward(channel, outputStreamProtocol, outputStreamHost, outputStreamPort);
+                boolean isChannelFoundAndActive = (channel != null);
+                if (isChannelFoundAndActive) {
+                    Forward forward = new Forward(id, channel, outputStreamProtocol, outputStreamHost, outputStreamPort);
                     forward.setEventType(eventType);
                     forward.setOutputStreamUsername(outputStreamUsername);
                     forward.setOutputStreamPassword(outputStreamPassword);
@@ -43,6 +49,8 @@ public class ForwardLoader {
                     forward.setOutputStreamTimeout(outputStreamTimeout);
                     forward.setOutputStreamClientLimit(outputStreamClientLimit);
                     channel.addForward(forward);
+                } else {
+                    logger.error("Can't find active channel id " + channelId + " for forward id " + id);
                 }
             }
 

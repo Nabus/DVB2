@@ -1,13 +1,14 @@
 package com.nabusdev.padmedvbts2.util;
+import static com.nabusdev.padmedvbts2.util.Variable.get;
 
 public class Constants {
-    public static final String IDENTIFICATION = "ident";
-    public static final String DB_USER = "dbUser";
-    public static final String DB_PASSWORD = "dbPassword";
-    public static final String DB_HOST = "dbHost";
-    public static final String DB_PORT = "dbPort";
-    public static final String DB_TYPE = "dbType";
-    public static final String DB_NAME = "dbName";
+    public static final String IDENTIFICATION = get("ident");
+    public static final String DB_USER = get("dbUser");
+    public static final String DB_PASSWORD = get("dbPassword");
+    public static final String DB_HOST = get("dbHost");
+    public static final String DB_PORT = get("dbPort");
+    public static final String DB_TYPE = get("dbType");
+    public static final String DB_NAME = get("dbName");
 
     public class Telnet {
         public static final int PORT = 12345;
@@ -33,7 +34,7 @@ public class Constants {
     public class Table {
 
         public class ServerSetup {
-            public static final String TABLE_NAME = "server_setup";
+            public static final String TABLE_NAME = "dvbts2.server_setup";
             public static final String IDENT = "ident";
             public static final String SETUP_KEY = "setup_key";
             public static final String SETUP_VALUE = "setup_value";
@@ -52,7 +53,7 @@ public class Constants {
         }
 
         public class Channels {
-            public static final String TABLE_NAME = "channels";
+            public static final String TABLE_NAME = "dvbts2.channels";
             public static final String ID = "ID";
             public static final String ADAPTER_ID = "adapter_id";
             public static final String NAME = "name";
@@ -70,7 +71,7 @@ public class Constants {
         }
 
         public class Adapters {
-            public static final String TABLE_NAME = "adapters";
+            public static final String TABLE_NAME = "dvbts2.adapters";
             public static final String ID = "ID";
             public static final String IDENT = "ident";
             public static final String PATH = "path";
@@ -89,7 +90,7 @@ public class Constants {
         }
 
         public class StreamForward {
-            public static final String TABLE_NAME = "stream_forward";
+            public static final String TABLE_NAME = "dvbts2.stream_forward";
             public static final String ID = "ID";
             public static final String CHANNEL_ID = "channel_id";
             public static final String EVENT_TYPE = "event_type";

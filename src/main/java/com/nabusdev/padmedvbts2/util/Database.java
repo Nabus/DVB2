@@ -12,7 +12,7 @@ public class Database {
     private String database;
     private String dbUser;
     private String dbPassword;
-    private Connection connection;
+    private Connection connection = null;
     private Logger logger = LoggerFactory.getLogger(Database.class);
 
     Database(String host, String port, String database, String dbUser, String dbPassword) {
@@ -26,7 +26,7 @@ public class Database {
     public void connect(){
         try {
             Class.forName("org.postgresql.Driver");
-            String connectionLink = "jdbc:" + get(DB_TYPE) + "://" + host + ":" + port + "/" + database;
+            String connectionLink = "jdbc:" + DB_TYPE + "://" + host + ":" + port + "/" + database;
             connection = DriverManager.getConnection(connectionLink, dbUser, dbPassword);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ public class Database {
 
     private Statement getStatement() {
         try {
-            if (connection.isClosed()) connect();
+            if (connection == null || connection.isClosed()) connect();
             return connection.createStatement();
         } catch (SQLException e) {
             e.printStackTrace();

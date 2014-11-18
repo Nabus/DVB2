@@ -1,6 +1,7 @@
 package com.nabusdev.padmedvbts2.model;
 
 public class Forward {
+    private int id;
     private Channel channel;
     private String eventType;
     private String outputStreamProtocol;
@@ -12,11 +13,16 @@ public class Forward {
     private int outputStreamTimeout = 30000;
     private int outputStreamClientLimit = 1;
 
-    public Forward(Channel channel, String outputStreamProtocol, String outputStreamHost, int outputStreamPort) {
+    public Forward(int id, Channel channel, String outputStreamProtocol, String outputStreamHost, int outputStreamPort) {
+        this.id = id;
         this.channel = channel;
         this.outputStreamProtocol = outputStreamProtocol;
         this.outputStreamHost = outputStreamHost;
         this.outputStreamPort = outputStreamPort;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Channel getChannel() {
