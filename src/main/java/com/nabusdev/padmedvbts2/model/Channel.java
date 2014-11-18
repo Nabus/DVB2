@@ -93,4 +93,8 @@ public class Channel {
     public void setStream(Stream stream) {
         this.stream = stream;
     }
+
+    public int getId() {
+        return id;
+    }
 }

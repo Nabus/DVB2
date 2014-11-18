@@ -54,7 +54,7 @@ public class Constants {
 
         public class Channels {
             public static final String TABLE_NAME = "dvbts2.channels";
-            public static final String ID = "ID";
+            public static final String ID = "id";
             public static final String ADAPTER_ID = "adapter_id";
             public static final String NAME = "name";
             public static final String IDENT = "ident";
@@ -72,7 +72,7 @@ public class Constants {
 
         public class Adapters {
             public static final String TABLE_NAME = "dvbts2.adapters";
-            public static final String ID = "ID";
+            public static final String ID = "id";
             public static final String IDENT = "ident";
             public static final String PATH = "path";
             public static final String ADAPTER_TYPE = "adapter_type";
@@ -91,7 +91,7 @@ public class Constants {
 
         public class StreamForward {
             public static final String TABLE_NAME = "dvbts2.stream_forward";
-            public static final String ID = "ID";
+            public static final String ID = "id";
             public static final String CHANNEL_ID = "channel_id";
             public static final String EVENT_TYPE = "event_type";
             public static final String OUTPUT_STREAM_PROTOCOL = "output_stream_protocol";
@@ -108,6 +108,17 @@ public class Constants {
             public static final String STREAMING_FAILED_MESSAGE = "streaming_failed_message";
             public static final String CONNECTION_ATTEMPTS = "connection_attempts";
             public static final String ACTIVE = "active";
+        }
+
+        public class ChannelThumbs {
+            public static final String TABLE_NAME = "dvbts2.channel_thumbs";
+            public static final String CHANNEL_ID = "channel_id";
+            public static final String PATH = "path";
+            public static final String FILENAME = "filename";
+            public static final String SIZE = "size";
+            public static final String FORMAT = "format";
+            public static final String ACTIVE = "active";
+            public static final String DATE_CREATED = "date_created";
         }
     }
 }

@@ -1,18 +1,16 @@
 package com.nabusdev.padmedvbts2.service;
+import static com.nabusdev.padmedvbts2.util.Constants.Table.ChannelThumbs.*;
 import com.nabusdev.padmedvbts2.model.Channel;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
+import com.nabusdev.padmedvbts2.util.Database;
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ThumbnailService {
-    private static final Map<String, String> formats = getFormats();
+    private static Database db = DatabaseProvider.getChannelsDB();
+    private static final Map<String, String> formats = getAllowedFormats();
     private static final ThumbnailService INSTANCE = new ThumbnailService();
     private static Logger logger = LoggerFactory.getLogger(ThumbnailService.class);
 
@@ -35,18 +33,38 @@ public class ThumbnailService {
 
     private void createThumb(Channel channel) {
         setTimer(channel);
-        // TODO
+        String pathToSave = channel.getThumbPath();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(channel.getThumbFilenamePattern());
+        String fileName = dateFormat.format(new Date());
+        String format = getValidFormat(channel.getThumbSaveFormat());
+
+        // TODO fileSize = saveFile(pathToSave, fileName, format)
+        int fileSize = 0;
+
+        String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +
+                SIZE + "," + FORMAT + "," + ACTIVE + "," + DATE_CREATED + ") VALUES (" + channel.getId() + ",'" +
+                pathToSave + "','" + fileName + "'," + fileSize + ",'" + format + "');";
+        db.execSql(query);
     }
 
-    private static Map<String, String> getFormats() {
+    private static String getValidFormat(String format) {
+        if (formats.containsKey(format)) {
+            return formats.get(format);
+        } else {
+            for (String validFormat : formats.values()) {
+                logger.error("Defined thumbnail format '" + format + "' is not supported. Setting default '" + validFormat + "'");
+                return validFormat;
+            }
+        }
+        logger.error("Can't find any supported thumbnail format");
+        return null;
+    }
+
+    private static Map<String, String> getAllowedFormats() {
+        if (formats != null) return formats;
         Map<String, String> formats = new HashMap<>();
         formats.put("JPEG", "jpg");
         formats.put("PNG", "png");
         return formats;
-    }
-
-    public boolean isInvalidFormat(String format) {
-        if (formats.containsKey(format)) return false;
-        return true;
     }
 }

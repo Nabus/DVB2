@@ -53,7 +53,7 @@ public class Database {
         return null;
     }
 
-    public void resultSql(String query) {
+    public void execSql(String query) {
         try { getStatement().executeUpdate(query); }
         catch (SQLException e) { e.printStackTrace(); }
     }

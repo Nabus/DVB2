@@ -67,7 +67,11 @@ public class ForwardingProcess implements Runnable {
                     List<Client> clientList = stream.getClientList();
                     for (Client client : clientList) {
                         OutputStream out = client.getDataOutputStream();
-                        out.write(readByte);
+                        try {
+                            out.write(readByte);
+                        } catch (IOException e) {
+                            /* Ignoring */
+                        }
                     }
                 }
             } catch (IOException e) {
