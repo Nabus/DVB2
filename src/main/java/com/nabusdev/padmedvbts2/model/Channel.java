@@ -1,7 +1,7 @@
 package com.nabusdev.padmedvbts2.model;
-import com.nabusdev.padmedvbts2.service.ForwardingProcess;
-
-import java.io.InputStream;
+import com.nabusdev.padmedvbts2.util.Database;
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import static com.nabusdev.padmedvbts2.util.Constants.Table.Channels.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +20,7 @@ public class Channel {
     private Stream stream;
     private List<Forward> forwards = new ArrayList<>();
     private static Map<Integer, Channel> channels = new HashMap<>();
+    private static Database db = DatabaseProvider.getChannelsDB();
 
     public Channel(int id, String name, String ident, Adapter adapter, int pnrId) {
         this.id = id;
@@ -96,5 +97,17 @@ public class Channel {
 
     public int getId() {
         return id;
+    }
+
+    public void notifyStartUsing() {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = UNIX_TIMESTAMP();");
+    }
+
+    public void notifyStopUsing() {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = UNIX_TIMESTAMP();");
+    }
+
+    public void notifyFailOccurred(String failedMessage) {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = UNIX_TIMESTAMP(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
     }
 }

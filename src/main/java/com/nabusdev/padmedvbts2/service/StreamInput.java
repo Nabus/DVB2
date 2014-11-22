@@ -11,18 +11,18 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.security.CodeSource;
 
-public class StreamInitialization {
+public class StreamInput {
     private static final String innerIp = "127.0.0.1";
     private static int innerPort = 27000;
-    private static int innerPid = 200;
     private static final String CONFIG_NAME = "stream%d.conf";
-    private static final StreamInitialization INSTANCE = new StreamInitialization();
-    private static Logger logger = LoggerFactory.getLogger(StreamInitialization.class);
+    private static final StreamInput INSTANCE = new StreamInput();
+    private static Logger logger = LoggerFactory.getLogger(StreamInput.class);
 
-    public static void init() {
+    public static void start() {
         for (Adapter adapter : Adapter.getAdapterList()) {
             INSTANCE.writeConfig(adapter);
             INSTANCE.executeMuMu(adapter);
+            adapter.notifyStartUsing();
         }
     }
 
@@ -39,17 +39,14 @@ public class StreamInitialization {
         writer.println("bandwidth=" + adapter.getBandwidth() + "MHz");
         writer.println("delivery_system=" + adapter.getAdapterType());
         writer.println("unicast=1");
-        writer.println("unicast_ip=" + innerIp);
-        writer.println("unicast_port=" + innerPort);
-
         for (Channel channel : adapter.getChannels()) {
-            writer.println("new_channel");
+            writer.println("channel_next");
             writer.println("name=" + channel.getName());
-            writer.println("ip=" + innerIp);
-            writer.println("port=" + ++innerPort);
-            writer.println("pids=" + ++innerPid);
+            writer.println("unicast_ip=" + innerIp);
+            writer.println("unicast_port=" + ++innerPort);
             Stream stream = new Stream(channel, innerIp, innerPort);
             new ForwardingProcess(stream);
+            channel.notifyStartUsing();
         }
         writer.close();
     }

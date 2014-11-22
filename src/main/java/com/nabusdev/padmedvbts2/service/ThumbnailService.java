@@ -38,7 +38,7 @@ public class ThumbnailService {
         String fileName = dateFormat.format(new Date());
         String format = getValidFormat(channel.getThumbSaveFormat());
 
-        // TODO fileSize = saveFile(pathToSave, fileName, format)
+        // TODO method int saveFile(pathToSave, fileName, format)
         int fileSize = 0;
 
         String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +

@@ -1,5 +1,4 @@
 package com.nabusdev.padmedvbts2.model;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

@@ -11,7 +11,8 @@ public class Main {
         AdapterLoader.load();
         ChannelLoader.load();
         ForwardLoader.load();
-        StreamService.init();
+        StreamInput.init();
+        StreamOutput.start();
         TelnetServer.init();
     }
 }

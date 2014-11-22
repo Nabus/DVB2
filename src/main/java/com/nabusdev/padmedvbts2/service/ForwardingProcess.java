@@ -62,13 +62,14 @@ public class ForwardingProcess implements Runnable {
     private void startWriting(InputStream in) {
         while (true) {
             try {
-                int readByte = in.read();
+                byte[] arr = new byte[4096];
+                int readByte = in.read(arr);
                 if (readByte != -1) {
                     List<Client> clientList = stream.getClientList();
                     for (Client client : clientList) {
                         OutputStream out = client.getDataOutputStream();
                         try {
-                            out.write(readByte);
+                            out.write(arr, 0, readByte);
                         } catch (IOException e) {
                             /* Ignoring */
                         }

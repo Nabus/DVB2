@@ -1,4 +1,7 @@
 package com.nabusdev.padmedvbts2.model;
+import com.nabusdev.padmedvbts2.util.Database;
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import static com.nabusdev.padmedvbts2.util.Constants.Table.Adapters.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,7 @@ public class Adapter {
     private String hierarchy;
     private List<Channel> channels = new ArrayList<>();
     private static Map<Integer, Adapter> adapters = new HashMap<>();
+    private static Database db = DatabaseProvider.getChannelsDB();
 
     public Adapter(int id, String ident, String path) {
        this.id = id;
@@ -82,5 +86,17 @@ public class Adapter {
 
     public int getFrequency() {
         return frequency;
+    }
+
+    public void notifyStartUsing() {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = UNIX_TIMESTAMP();");
+    }
+
+    public void notifyStopUsing() {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = UNIX_TIMESTAMP();");
+    }
+
+    public void notifyFailOccurred(String failedMessage) {
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = UNIX_TIMESTAMP(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
     }
 }
