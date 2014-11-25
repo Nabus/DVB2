@@ -1,6 +1,12 @@
 package com.nabusdev.padmedvbts2.service;
 import static com.nabusdev.padmedvbts2.util.Constants.Xml.EpgResult.*;
+import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
+import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Programme;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -8,6 +14,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -17,6 +24,7 @@ import java.util.List;
 
 public class EpgCollector {
     public static EpgCollector INSTANCE = new EpgCollector();
+    private static Logger logger = LoggerFactory.getLogger(EpgCollector.class);
 
     public static void collect() {
         INSTANCE.collectHandler();
@@ -30,15 +38,35 @@ public class EpgCollector {
 
         public void run() {
             grabEpgToXml();
-            List<Programme> programmes = readResultXml();
+            List<Integer> pnrList = getNeededPnrList();
+            List<Programme> programmes = readResultXml(pnrList);
+            if (programmes.isEmpty()) {
+                logger.error("Unable to get event data from multiplex");
+            }
+        }
+
+        private List<Integer> getNeededPnrList() {
+            List<Integer> pnrList = new ArrayList<>();
+            for (Channel channel : Channel.getChannelList()) {
+                pnrList.add(channel.getId());
+            }
+            return pnrList;
         }
 
         private void grabEpgToXml() {
+            try {
+                String line = "tv_grab_dvb -t 5 -s > " + JAVA_EXEC_PATH + File.separator + XML_PATH;
+                CommandLine cmdLine = CommandLine.parse(line);
+                DefaultExecutor executor = new DefaultExecutor();
+                executor.execute(cmdLine);
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         @SuppressWarnings({ "unchecked", "null" })
-        private List<Programme> readResultXml() {
+        private List<Programme> readResultXml(List<Integer> allowedPnrList) {
             List<Programme> programmes = new ArrayList<Programme>();
 
             try {
@@ -47,7 +75,7 @@ public class EpgCollector {
                 XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
                 Programme programme = null;
 
-                while (eventReader.hasNext()) {
+                while (eventReader.hasNext()) allowedBreak: {
                     XMLEvent event = eventReader.nextEvent();
                     if (event.isStartElement()) {
                         StartElement startElement = event.asStartElement();
@@ -61,8 +89,9 @@ public class EpgCollector {
                                 String attributeName = attribute.getName().toString();
                                 if (attributeName.equals(CHANNEL)) {
                                     String channel = attribute.getValue();
-                                    int channelId = Integer.parseInt(channel.replace(".dvb.guide", ""));
-                                    programme.setChannelId(channelId);
+                                    int channelPnr = Integer.parseInt(channel.replace(".dvb.guide", ""));
+                                    if (allowedPnrList.contains(channelPnr) == false) break allowedBreak;
+                                    programme.setChannelId(channelPnr);
                                 } else if (attributeName.equals(START)) {
                                     String startStr = attribute.getValue();
                                     long start = Long.parseLong(startStr.split(" ")[0]);

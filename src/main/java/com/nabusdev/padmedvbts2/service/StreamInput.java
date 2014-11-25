@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.service;
-import com.nabusdev.padmedvbts2.Main;
+import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Stream;
@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.PrintWriter;
-import java.security.CodeSource;
 
 public class StreamInput {
     private static final String innerIp = "127.0.0.1";
@@ -68,11 +67,8 @@ public class StreamInput {
 
         public void run() {
             try {
-                CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
-                File jarFile = new File(codeSource.getLocation().toURI().getPath());
-                String jarDir = jarFile.getParentFile().getPath();
                 String configName = String.format(CONFIG_NAME, adapter.getId());
-                String line = "mumudvb -d -c " + jarDir + File.separator + configName;
+                String line = "mumudvb -d -c " + JAVA_EXEC_PATH + File.separator + configName;
                 CommandLine cmdLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 int exitValue = executor.execute(cmdLine);

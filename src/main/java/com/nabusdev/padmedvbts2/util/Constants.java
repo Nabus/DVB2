@@ -1,4 +1,10 @@
 package com.nabusdev.padmedvbts2.util;
+import com.nabusdev.padmedvbts2.Main;
+
+import java.io.File;
+import java.net.URISyntaxException;
+import java.security.CodeSource;
+
 import static com.nabusdev.padmedvbts2.util.Variable.get;
 
 public class Constants {
@@ -9,6 +15,19 @@ public class Constants {
     public static final String DB_PORT = get("dbPort");
     public static final String DB_TYPE = get("dbType");
     public static final String DB_NAME = get("dbName");
+    public static final String JAVA_EXEC_PATH = getJavaExecutablePath();
+
+    private static String getJavaExecutablePath() {
+        try {
+            CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
+            File jarFile = new File(codeSource.getLocation().toURI().getPath());
+            String jarDir = jarFile.getParentFile().getPath();
+            return jarDir;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
 
     public class Telnet {
         public static final int PORT = 12345;
@@ -125,7 +144,7 @@ public class Constants {
     public class Xml {
 
         public class EpgResult {
-            public static final String XML_PATH = "result.xml";
+            public static final String XML_PATH = "epg.xml";
             public static final String PROGRAMME = "programme";
             public static final String CHANNEL = "channel";
             public static final String START = "start";
