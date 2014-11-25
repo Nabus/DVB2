@@ -19,6 +19,10 @@ public class StreamOutput {
         }
     }
 
+    public static void stop() {
+        // TODO
+    }
+
     private void startHttpServer(Forward forward) {
         new Thread(new HttpServer(forward)).start();
     }

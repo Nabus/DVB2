@@ -26,6 +26,10 @@ public class StreamInput {
         }
     }
 
+    public static void stop() {
+        // TODO
+    }
+
     private void writeConfig(Adapter adapter) {
         PrintWriter writer = null;
         String configName = String.format(CONFIG_NAME, adapter.getId());

@@ -1,8 +1,7 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
 import static com.nabusdev.padmedvbts2.util.Constants.Telnet.Commands.*;
-
 import com.nabusdev.padmedvbts2.service.StreamInput;
-import com.nabusdev.padmedvbts2.service.StreamService;
+import com.nabusdev.padmedvbts2.service.StreamOutput;
 import com.nabusdev.padmedvbts2.service.telnet.CommandsCase;
 import com.nabusdev.padmedvbts2.service.telnet.TelnetCommand;
 import org.apache.mina.core.session.IoSession;
@@ -11,12 +10,12 @@ public class Channel implements CommandsCase {
 
     @TelnetCommand(CHANNEL_INPUT_START)
     private void inputStart(IoSession session) {
-        StreamInput.init();
+        StreamInput.start();
     }
 
     @TelnetCommand(CHANNEL_INPUT_STOP)
     private void inputStop(IoSession session) {
-        // TODO
+        StreamInput.stop();
     }
 
     @TelnetCommand(CHANNEL_INPUT_RESTART)
@@ -27,12 +26,12 @@ public class Channel implements CommandsCase {
 
     @TelnetCommand(CHANNEL_OUTPUT_START)
     private void outputStart(IoSession session) {
-        StreamService.init();
+        StreamOutput.start();
     }
 
     @TelnetCommand(CHANNEL_OUTPUT_STOP)
     private void outputStop(IoSession session) {
-        // TODO
+        StreamOutput.stop();
     }
 
     @TelnetCommand(CHANNEL_OUTPUT_RESTART)

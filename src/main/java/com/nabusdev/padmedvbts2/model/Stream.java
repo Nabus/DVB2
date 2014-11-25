@@ -6,7 +6,6 @@ public class Stream {
     private Channel channel;
     private String ip;
     private int port;
-    private boolean isForwarding = false;
     private List<Client> listeners = new ArrayList<>();
     private static List<Stream> streams = new ArrayList<>();
 
@@ -39,13 +38,5 @@ public class Stream {
 
     public int getPort() {
         return port;
-    }
-
-    public boolean isForwarding() {
-        return isForwarding;
-    }
-
-    public void startForward() {
-        isForwarding = true;
     }
 }

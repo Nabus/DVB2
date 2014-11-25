@@ -11,8 +11,9 @@ public class Main {
         AdapterLoader.load();
         ChannelLoader.load();
         ForwardLoader.load();
-        StreamInput.init();
+        StreamInput.start();
         StreamOutput.start();
+        EpgCollector.collect();
         TelnetServer.init();
     }
 }

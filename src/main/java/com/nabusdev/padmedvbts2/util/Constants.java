@@ -121,4 +121,32 @@ public class Constants {
             public static final String DATE_CREATED = "date_created";
         }
     }
+
+    public class Xml {
+
+        public class EpgResult {
+            public static final String XML_PATH = "result.xml";
+            public static final String PROGRAMME = "programme";
+            public static final String CHANNEL = "channel";
+            public static final String START = "start";
+            public static final String STOP = "stop";
+            public static final String TITLE = "title";
+            public static final String TITLE_LANG = "lang";
+            public static final String SUBTITLE = "sub-title";
+            public static final String SUBTITLE_LANG = "lang";
+            public static final String DESC = "desc";
+            public static final String DESC_LANG = "lang";
+            public static final String LANGUAGE = "language";
+            public static final String VIDEO = "video";
+            public static final String VIDEO_ASPECT = "aspect";
+            public static final String AUDIO = "audio";
+            public static final String AUDIO_STEREO = "stereo";
+            public static final String RATING = "rating";
+            public static final String RATING_SYSTEM = "dvb";
+            public static final String RATING_VALUE = "value";
+            public static final String SUBTITLES = "subtitles";
+            public static final String SUBTITLES_TYPE = "type";
+            public static final String SUBTITLES_LANGUAGE = "language";
+        }
+    }
 }
