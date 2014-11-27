@@ -42,6 +42,9 @@ public class EpgCollector {
             List<Programme> programmes = readResultXml(pnrList);
             if (programmes.isEmpty()) {
                 logger.error("Unable to get event data from multiplex");
+            } else {
+                // How many adapters need to scan EPG?
+                // How to persist to DB epg info?
             }
         }
 
@@ -55,7 +58,7 @@ public class EpgCollector {
 
         private void grabEpgToXml() {
             try {
-                String line = "tv_grab_dvb -t 5 -s > " + JAVA_EXEC_PATH + File.separator + XML_PATH;
+                String line = "tv_grab_dvb_plus --timeout 10 --adapter 0 --output " + JAVA_EXEC_PATH + File.separator + XML_PATH;
                 CommandLine cmdLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 executor.execute(cmdLine);

@@ -1,10 +1,21 @@
 package com.nabusdev.padmedvbts2.service;
+import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.ChannelThumbs.*;
 import com.nabusdev.padmedvbts2.model.Channel;
+import com.nabusdev.padmedvbts2.model.Stream;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import org.jcodec.api.FrameGrab;
+import org.jcodec.common.model.Picture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -37,14 +48,41 @@ public class ThumbnailService {
         SimpleDateFormat dateFormat = new SimpleDateFormat(channel.getThumbFilenamePattern());
         String fileName = dateFormat.format(new Date());
         String format = getValidFormat(channel.getThumbSaveFormat());
-
-        // TODO method int saveFile(pathToSave, fileName, format)
-        int fileSize = 0;
-
+        int fileSize = saveThumbnail(channel, pathToSave, fileName, format);
         String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +
                 SIZE + "," + FORMAT + "," + ACTIVE + "," + DATE_CREATED + ") VALUES (" + channel.getId() + ",'" +
                 pathToSave + "','" + fileName + "'," + fileSize + ",'" + format + "');";
         db.execSql(query);
+    }
+
+    private int saveThumbnail(Channel channel, String pathToSave, String fileName, String format) {
+        File thumbSource = new File(JAVA_EXEC_PATH + File.separator + "thumbSource.video");
+        if (thumbSource.exists()) thumbSource.delete();
+        Stream stream = channel.getStream();
+        try {
+            FileOutputStream fileStream = new FileOutputStream(thumbSource);
+            URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort());
+            URLConnection connection = url.openConnection();
+            long startRecord = System.currentTimeMillis();
+            int MILLIS_FACTOR = 1000;
+            while (System.currentTimeMillis() - startRecord <= MILLIS_FACTOR) {
+                byte[] arr = new byte[4096];
+                int readByte = connection.getInputStream().read(arr);
+                if (readByte != -1) {
+                    fileStream.write(arr, 0, readByte);
+                }
+            }
+            fileStream.close();
+            File thumbFile;
+            int FRAME_NUMBER = 1;
+            BufferedImage frame = FrameGrab.getFrame(thumbSource, FRAME_NUMBER);
+            ImageIO.write(frame, format, thumbFile = new File(pathToSave + File.separator + fileName + "." + format));
+            return (int) thumbFile.length();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     private static String getValidFormat(String format) {
