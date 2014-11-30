@@ -6,7 +6,6 @@ import com.nabusdev.padmedvbts2.model.Stream;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.jcodec.api.FrameGrab;
-import org.jcodec.common.model.Picture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +24,14 @@ public class ThumbnailService {
     private static final ThumbnailService INSTANCE = new ThumbnailService();
     private static Logger logger = LoggerFactory.getLogger(ThumbnailService.class);
 
-    public static void init() {
+    public static void scheduleAll() {
         for (Channel channel : Channel.getChannelList()) {
-            INSTANCE.setTimer(channel);
+            schedule(channel);
         }
+    }
+
+    public static void schedule(Channel channel) {
+        INSTANCE.setTimer(channel);
     }
 
     private void setTimer(final Channel channel) {
@@ -39,7 +42,7 @@ public class ThumbnailService {
             }
         };
         int captureInterval = channel.getThumbSavePeriod();
-        timer.schedule(timerTask, captureInterval);
+        timer.scheduleAtFixedRate(timerTask, captureInterval, captureInterval);
     }
 
     private void createThumb(Channel channel) {

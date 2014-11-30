@@ -133,61 +133,6 @@ CREATE TABLE dvbts2.channels (
 	CONSTRAINT fk_channels_adapter_id FOREIGN KEY (adapter_id) REFERENCES dvbts2.adapters (id)
 );
 
-/*
-Used to store information about channels in EPG
-*/
-CREATE TABLE dvbts2.epg_channels (
-	id SERIAL,
-	
-	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this epg channel belongs
-
-	dvb_channel_id VARCHAR(255) NOT NULL, -- channel id from dvb e.g. I10436.labs.zap2it.com
-	display_name TEXT, -- display names of channel separated by | e.g. 13 KERA|13 KERA TX42822|
-	icon TEXT,
-
-	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg channel is active and available, false = deleted and not active
-
-	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
-
-	CONSTRAINT pk_epg_channels PRIMARY KEY ( id ),
-	CONSTRAINT fk_epg_channels_channel_id FOREIGN KEY (channel_id) REFERENCES dvbts2.channels (id)
-);
-
-/*
-Used to store information about programme of some channel in EPG
-*/
-CREATE TABLE dvbts2.epg_programmes (
-	id SERIAL,
-
-	epg_channel_id INTEGER NOT NULL, -- reference to dvbts2.epg_channels to what channel this epg program belongs
-
-	date_start TIMESTAMP NOT NULL, -- when programme is scheduled to start
-	date_stop TIMESTAMP NOT NULL, -- when programme is scheduled to stop
-	date_make DATE, -- date of creating programme
-
-	episode_dd_progid VARCHAR(255), -- e.g. EP00003847.0074
-	episode_onscreen VARCHAR(255), -- e.g. 901
-
-	audio VARCHAR(255), -- values separated by | , e.g. stereo|dual
-
-	previously_shown TIMESTAMP, -- when programme was scheduled to start previously
-
-	subtitles_type VARCHAR(255), -- e.g. teletext
-	subtitles_value VARCHAR(255),
-
-	rating_system VARCHAR(255), -- e.g. VCHIP
-	rating_value VARCHAR(255), -- e.g. TV-14
-
-
-	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg programme is active and available, false = deleted and not active
-
-	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
-
-	CONSTRAINT pk_epg_programmes PRIMARY KEY ( id ),
-	CONSTRAINT fk_epg_programmes_epg_channel_id FOREIGN KEY (epg_channel_id) REFERENCES dvbts2.epg_channels (id)
-);
-
-
 CREATE TABLE dvbts2.lang (
 	name VARCHAR(255) NOT NULL, -- Lang name
 	name_hum VARCHAR(255) NOT NULL, -- Lang name human readable to show
@@ -199,66 +144,36 @@ INSERT INTO dvbts2.lang( name, name_hum ) VALUES( 'CZ', 'Cz' );
 INSERT INTO dvbts2.lang( name, name_hum ) VALUES( 'SK', 'Sk' );
 
 /*
-Used to store information about programme title
+Used to store EPG information
 */
-CREATE TABLE dvbts2.epg_programme_title (
+CREATE TABLE dvbts2.epg_programmes (
 	id SERIAL,
+	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this epg programme belongs
+	date_start TIMESTAMP NOT NULL, -- when programme is scheduled to start
+	date_stop TIMESTAMP NOT NULL, -- when programme is scheduled to stop
+	date_make DATE, -- date of creating programme
+	title VARCHAR(255),
+	title_lang VARCHAR(255) NOT NULL,
+	subtitle VARCHAR(255),
+	subtitle_lang VARCHAR(255) NOT NULL,
+	description VARCHAR(255),
+	description_lang VARCHAR(255) NOT NULL,
+	lang VARCHAR(255),
+	video_aspect VARCHAR(255),
+	audio VARCHAR(255), -- values separated by | , e.g. stereo|dual
+	rating_system VARCHAR(255), -- e.g. VCHIP
+	rating_value VARCHAR(255), -- e.g. TV-14
+	subtitles_type VARCHAR(255), -- e.g. teletex
+	subtitles_lang VARCHAR(255) NOT NULL,
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg programme is active and available, false = deleted and not active
 
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this title belongs
-
-	lang_name VARCHAR(255) NOT NULL, -- language
-	val TEXT, -- value
-	sub INTEGER NOT NULL DEFAULT 0, -- 1 = true, 0 = false, determine whenever this epg programme title is sub-title (<sub-title lang="en">Foyle's War, Series IV: Casualties of War</sub-title>)
-
-	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg programme title is active and available, false = deleted and not active
-
-	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
-
-	CONSTRAINT pk_epg_programme_title PRIMARY KEY ( id ),
-	CONSTRAINT fk_epg_programme_title_epg_programme_id FOREIGN KEY (epg_programme_id) REFERENCES dvbts2.epg_programmes (id),
-	CONSTRAINT fk_epg_programme_title_lang_name FOREIGN KEY (lang_name) REFERENCES dvbts2.lang (name)
+	CONSTRAINT pk_epg_programmes PRIMARY KEY ( id ),
+	CONSTRAINT fk_epg_programmes_channel_id FOREIGN KEY (channel_id) REFERENCES dvbts2.channels (id),
+	CONSTRAINT fk_epg_programmes_title_lang_name FOREIGN KEY (title_lang) REFERENCES dvbts2.lang (name),
+	CONSTRAINT fk_epg_programmes_subtitle_lang_name FOREIGN KEY (subtitle_lang) REFERENCES dvbts2.lang (name),
+	CONSTRAINT fk_epg_programmes_description_lang_name FOREIGN KEY (description_lang) REFERENCES dvbts2.lang (name),
+	CONSTRAINT fk_epg_programmes_subtitles_lang_name FOREIGN KEY (subtitles_lang) REFERENCES dvbts2.lang (name)
 );
-
-/*
-Used to store information about programme description
-*/
-CREATE TABLE dvbts2.epg_programme_desc (
-	id SERIAL,
-
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this description belongs
-
-	lang_name VARCHAR(255) NOT NULL, -- language
-	val TEXT, -- value
-
-	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg programme description is active and available, false = deleted and not active
-
-	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
-
-	CONSTRAINT pk_epg_programme_desc PRIMARY KEY ( id ),
-	CONSTRAINT fk_epg_programme_desc_epg_programme_id FOREIGN KEY (epg_programme_id) REFERENCES dvbts2.epg_programmes (id),
-	CONSTRAINT fk_epg_programme_desc_lang_name FOREIGN KEY (lang_name) REFERENCES dvbts2.lang (name)
-);
-
-/*
-Used to store information about programme category
-*/
-CREATE TABLE dvbts2.epg_programme_category (
-	id SERIAL,
-
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this category belongs
-
-	lang_name VARCHAR(255) NOT NULL, -- language
-	val TEXT, -- value
-
-	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this epg programme category is active and available, false = deleted and not active
-
-	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
-
-	CONSTRAINT pk_epg_programme_category PRIMARY KEY ( id ),
-	CONSTRAINT fk_epg_programme_category_epg_programme_id FOREIGN KEY (epg_programme_id) REFERENCES dvbts2.epg_programmes (id),
-	CONSTRAINT fk_epg_programme_category_lang_name FOREIGN KEY (lang_name) REFERENCES dvbts2.lang (name)
-);
-
 
 CREATE TABLE dvbts2.credit_type (
 	name VARCHAR(255) NOT NULL, -- Credit type name

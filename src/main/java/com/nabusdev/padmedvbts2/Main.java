@@ -13,7 +13,8 @@ public class Main {
         ForwardLoader.load();
         StreamInput.start();
         StreamOutput.start();
-        EpgCollector.collect();
-        TelnetServer.init();
+        TelnetServer.start();
+        EpgCollector.scheduleAll();
+        ThumbnailService.scheduleAll();
     }
 }

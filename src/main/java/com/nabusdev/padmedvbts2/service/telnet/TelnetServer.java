@@ -18,7 +18,7 @@ import java.util.Enumeration;
 
 public class TelnetServer {
 
-    public static void init() {
+    public static void start() {
         IoAcceptor acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("logger", new LoggingFilter());
         acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(

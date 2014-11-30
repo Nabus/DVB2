@@ -20,8 +20,8 @@ public class Channel implements CommandsCase {
 
     @TelnetCommand(CHANNEL_INPUT_RESTART)
     private void inputRestart(IoSession session) {
-        inputStart(session);
         inputStop(session);
+        inputStart(session);
     }
 
     @TelnetCommand(CHANNEL_OUTPUT_START)
@@ -36,8 +36,8 @@ public class Channel implements CommandsCase {
 
     @TelnetCommand(CHANNEL_OUTPUT_RESTART)
     private void outputRestart(IoSession session) {
-        outputStart(session);
         outputStop(session);
+        outputStart(session);
     }
 
     @TelnetCommand(CHANNEL_RENEW)

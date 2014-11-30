@@ -5,15 +5,20 @@ import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Stream;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class StreamInput {
-    private static final String innerIp = "127.0.0.1";
     private static int innerPort = 27000;
+    private static final String innerIp = "127.0.0.1";
     private static final String CONFIG_NAME = "stream%d.conf";
+    private static Map<Adapter, Executor> executors = new HashMap<>();
     private static final StreamInput INSTANCE = new StreamInput();
     private static Logger logger = LoggerFactory.getLogger(StreamInput.class);
 
@@ -26,7 +31,9 @@ public class StreamInput {
     }
 
     public static void stop() {
-        // TODO
+        for (Executor executor : executors.values()) {
+            executor.getWatchdog().destroyProcess();
+        }
     }
 
     private void writeConfig(Adapter adapter) {
@@ -71,6 +78,7 @@ public class StreamInput {
                 String line = "mumudvb -d -c " + JAVA_EXEC_PATH + File.separator + configName;
                 CommandLine cmdLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
+                executor.setWatchdog(new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT));
                 int exitValue = executor.execute(cmdLine);
                 if (exitValue != 0) logger.error("MuMuDVB is stopping with exit code " + exitValue);
             } catch (Exception e) {

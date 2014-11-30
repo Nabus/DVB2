@@ -11,8 +11,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class HttpServer implements Runnable {
+public class HttpServer implements Runnable, ForwardProcess {
     private Forward forward;
+    private ServerSocket network = null;
     private static Logger logger = LoggerFactory.getLogger(HttpServer.class);
 
     HttpServer(Forward forward) {
@@ -32,12 +33,20 @@ public class HttpServer implements Runnable {
         }
     }
 
+    public void stop() {
+        if (network != null) {
+            try { network.close(); }
+            catch (IOException e) { e.printStackTrace(); }
+        }
+    }
+
     private void runHandler() throws Exception {
+        final int BACKLOG = 0;
         int port = forward.getOutputStreamPort();
         InetAddress host = InetAddress.getByName(forward.getOutputStreamHost());
-        final int BACKLOG = 0;
-        try (ServerSocket network = new ServerSocket(port, BACKLOG, host)) {
-            while (true) {
+        network = new ServerSocket(port, BACKLOG, host);
+        try {
+            while (!network.isClosed()) {
                 Socket socket = network.accept();
                 Client client = new Client(socket);
                 Stream stream = forward.getChannel().getStream();

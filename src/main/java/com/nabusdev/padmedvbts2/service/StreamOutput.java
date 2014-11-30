@@ -5,7 +5,11 @@ import com.nabusdev.padmedvbts2.model.Forward;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class StreamOutput {
+    private static Map<Forward, ForwardProcess> processes = new HashMap<>();
     private static final StreamOutput INSTANCE = new StreamOutput();
     private static Logger logger = LoggerFactory.getLogger(StreamOutput.class);
 
@@ -20,7 +24,9 @@ public class StreamOutput {
     }
 
     public static void stop() {
-        // TODO
+        for (ForwardProcess process : processes.values()) {
+            process.stop();
+        }
     }
 
     private void startHttpServer(Forward forward) {

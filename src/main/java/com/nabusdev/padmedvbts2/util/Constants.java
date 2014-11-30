@@ -17,18 +17,6 @@ public class Constants {
     public static final String DB_NAME = get("dbName");
     public static final String JAVA_EXEC_PATH = getJavaExecutablePath();
 
-    private static String getJavaExecutablePath() {
-        try {
-            CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
-            File jarFile = new File(codeSource.getLocation().toURI().getPath());
-            String jarDir = jarFile.getParentFile().getPath();
-            return jarDir;
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     public class Telnet {
         public static final int PORT = 12345;
         public static final String LAST_CONFIGURATION_READ = "lastConfigurationRead"; // for 'CONFIG STATUS' telnet com
@@ -139,6 +127,29 @@ public class Constants {
             public static final String ACTIVE = "active";
             public static final String DATE_CREATED = "date_created";
         }
+
+        public class EpgProgrammes {
+            public static final String TABLE_NAME = "dvbts2.epg_programmes";
+            public static final String ID = "id";
+            public static final String CHANNEL_ID = "channel_id";
+            public static final String DATE_START = "date_start";
+            public static final String DATE_STOP = "date_stop";
+            public static final String DATE_MAKE = "date_make";
+            public static final String TITLE = "title";
+            public static final String TITLE_LANG = "title_lang";
+            public static final String SUBTITLE = "subtitle";
+            public static final String SUBTITLE_LANG = "subtitle_lang";
+            public static final String DESCRIPTION = "description";
+            public static final String DESCRIPTION_LANG = "description_lang";
+            public static final String LANG = "lang";
+            public static final String VIDEO_ASPECT = "video_aspect";
+            public static final String AUDIO = "audio";
+            public static final String RATING_SYSTEM = "rating_system";
+            public static final String RATING_VALUE = "rating_value";
+            public static final String SUBTITLES_TYPE = "subtitles_type";
+            public static final String SUBTITLES_LANG = "subtitles_lang";
+            public static final String ACTIVE = "active";
+        }
     }
 
     public class Xml {
@@ -167,5 +178,17 @@ public class Constants {
             public static final String SUBTITLES_TYPE = "type";
             public static final String SUBTITLES_LANGUAGE = "language";
         }
+    }
+
+    private static String getJavaExecutablePath() {
+        try {
+            CodeSource codeSource = Main.class.getProtectionDomain().getCodeSource();
+            File jarFile = new File(codeSource.getLocation().toURI().getPath());
+            String jarDir = jarFile.getParentFile().getPath();
+            return jarDir;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

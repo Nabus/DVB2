@@ -46,6 +46,12 @@ public class Database {
         return null;
     }
 
+    public PreparedStatement getPrepareStatement(String query) {
+        try { return connection.prepareStatement(query); }
+        catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
     public ResultSet selectSql(String query) {
         try { return getStatement().executeQuery(query); }
         catch (SQLException e) { e.printStackTrace(); }
