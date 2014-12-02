@@ -14,7 +14,7 @@ public class Variable {
         return variables.get(key);
     }
 
-    public static void add(String value, String key) {
+    public static void set(String value, String key) {
         variables.put(value, key);
     }
 

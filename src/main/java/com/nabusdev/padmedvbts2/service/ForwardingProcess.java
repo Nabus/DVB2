@@ -32,7 +32,7 @@ public class ForwardingProcess implements Runnable {
 
         while (tryCount < MAX_TRY_COUNT) {
             try {
-                URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort());
+                URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort() + stream.getPath());
                 URLConnection connection = url.openConnection();
                 return connection;
             } catch (IOException e) {
@@ -65,7 +65,7 @@ public class ForwardingProcess implements Runnable {
                 byte[] arr = new byte[4096];
                 int readByte = in.read(arr);
                 if (readByte != -1) {
-                    List<Client> clientList = stream.getClientList();
+                    List<Client> clientList = stream.getClients();
                     for (Client client : clientList) {
                         OutputStream out = client.getDataOutputStream();
                         try {

@@ -47,11 +47,23 @@ public class Channel implements CommandsCase {
 
     @TelnetCommand(CHANNEL_STATUS)
     private void status(IoSession session) {
-        // TODO
+        int channelId = (int) session.getAttribute("argument");
+        com.nabusdev.padmedvbts2.model.Channel channel = com.nabusdev.padmedvbts2.model.Channel.getById(channelId);
+        String status = channel.getStatus().name();
+        session.setAttribute("answer", status);
     }
 
     @TelnetCommand(CHANNEL_ALLSTATUS)
     private void allstatus(IoSession session) {
-        // TODO
+        StringBuffer table = new StringBuffer();
+        table.append(String.format("%-5s %-5s %s%n", "ID", "Adapter", "Status"));
+        table.append("------------------------------------\n");
+        for (com.nabusdev.padmedvbts2.model.Channel channel : com.nabusdev.padmedvbts2.model.Channel.getChannelList()) {
+            int channelId = channel.getId();
+            int adapterId = channel.getAdapter().getId();
+            String status = channel.getStatus().name();
+            table.append(String.format("%-5d %-5d %s%n", channelId, adapterId, status));
+        }
+        session.setAttribute("answer", table.toString());
     }
 }

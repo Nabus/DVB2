@@ -17,6 +17,8 @@ public class Adapter {
     private String transmissionMode;
     private String guardInterval;
     private String hierarchy;
+    private String serviceIp;
+    private int servicePort;
     private List<Channel> channels = new ArrayList<>();
     private static Map<Integer, Adapter> adapters = new HashMap<>();
     private static Database db = DatabaseProvider.getChannelsDB();
@@ -98,5 +100,21 @@ public class Adapter {
 
     public void notifyFailOccurred(String failedMessage) {
         db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = UNIX_TIMESTAMP(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
+    }
+
+    public int getServicePort() {
+        return servicePort;
+    }
+
+    public void setServicePort(int servicePort) {
+        this.servicePort = servicePort;
+    }
+
+    public String getServiceIp() {
+        return serviceIp;
+    }
+
+    public void setServiceIp(String serviceIp) {
+        this.serviceIp = serviceIp;
     }
 }

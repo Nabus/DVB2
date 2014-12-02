@@ -4,28 +4,37 @@ import java.util.List;
 
 public class Stream {
     private Channel channel;
-    private String ip;
-    private int port;
-    private List<Client> listeners = new ArrayList<>();
+    private String path;
+    private int serviceId;
+    private List<Client> clients = new ArrayList<>();
     private static List<Stream> streams = new ArrayList<>();
 
-    public Stream(Channel channel, String ip, int port) {
-        this.channel = channel;
-        this.ip = ip;
-        this.port = port;
+    public Stream() {
         streams.add(this);
     }
 
-    public void addClient(Client client) {
-        listeners.add(client);
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
-    public List<Client> getClientList() {
-        return listeners;
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setServiceId(int serviceId) {
+        this.serviceId = serviceId;
     }
 
     public static List<Stream> getStreams() {
         return streams;
+    }
+
+    public void addClient(Client client) {
+        clients.add(client);
+    }
+
+    public List<Client> getClients() {
+        return clients;
     }
 
     public Channel getChannel() {
@@ -33,10 +42,21 @@ public class Stream {
     }
 
     public String getIp() {
-        return ip;
+        return channel.getAdapter().getServiceIp();
     }
 
     public int getPort() {
-        return port;
+        return channel.getAdapter().getServicePort();
+    }
+
+    public String getPath() {
+        final String URL_SLASH = "/";
+        if (path == null) path = URL_SLASH;
+        else if (!path.startsWith(URL_SLASH)) return URL_SLASH + path;
+        return path;
+    }
+
+    public int getServiceId() {
+        return serviceId;
     }
 }

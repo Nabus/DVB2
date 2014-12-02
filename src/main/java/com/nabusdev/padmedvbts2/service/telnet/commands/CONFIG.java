@@ -1,6 +1,6 @@
 package com.nabusdev.padmedvbts2.service.telnet.commands;
 import static com.nabusdev.padmedvbts2.util.Constants.Telnet.Commands.*;
-import static com.nabusdev.padmedvbts2.util.Constants.Telnet.*;
+import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
 import com.nabusdev.padmedvbts2.service.config.DatabaseLoader;
 import com.nabusdev.padmedvbts2.service.telnet.CommandsCase;
 import com.nabusdev.padmedvbts2.service.telnet.TelnetCommand;

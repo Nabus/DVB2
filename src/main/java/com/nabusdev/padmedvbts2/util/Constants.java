@@ -17,9 +17,11 @@ public class Constants {
     public static final String DB_NAME = get("dbName");
     public static final String JAVA_EXEC_PATH = getJavaExecutablePath();
 
-    public class Telnet {
-        public static final int PORT = 12345;
+    public class Variables {
         public static final String LAST_CONFIGURATION_READ = "lastConfigurationRead"; // for 'CONFIG STATUS' telnet com
+    }
+
+    public class Telnet {
 
         public class Commands {
             public static final String CHANNEL_INPUT_START = "CHANNEL INPUT START";

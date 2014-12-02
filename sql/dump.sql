@@ -295,7 +295,7 @@ CREATE TABLE dvbts2.stream_statistics (
 	err INTEGER NOT NULL, -- actual stream packet error value
 	packets INTEGER NOT NULL, -- actual stream packet value
 
-	-- todo add more info columns
+	-- todo set more info columns
 
 	note TEXT, -- Some useful information to Admin eyes only
 	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created

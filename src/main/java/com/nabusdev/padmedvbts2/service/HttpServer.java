@@ -53,7 +53,6 @@ public class HttpServer implements Runnable, ForwardProcess {
                 writeResponse(client);
                 stream.addClient(client);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StreamOutput {
-    private static Map<Forward, ForwardProcess> processes = new HashMap<>();
     private static final StreamOutput INSTANCE = new StreamOutput();
+    private static Map<Forward, ForwardProcess> processes = new HashMap<>();
     private static Logger logger = LoggerFactory.getLogger(StreamOutput.class);
 
     public static void start() {
@@ -30,6 +30,8 @@ public class StreamOutput {
     }
 
     private void startHttpServer(Forward forward) {
-        new Thread(new HttpServer(forward)).start();
+        ForwardProcess forwardProcess = new HttpServer(forward);
+        new Thread((HttpServer) forwardProcess).start();
+        processes.put(forward, forwardProcess);
     }
 }
