@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.service.telnet;
-import static com.nabusdev.padmedvbts2.util.Constants.Table.ServerSetup.*;
+import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
 import com.nabusdev.padmedvbts2.util.Variable;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;

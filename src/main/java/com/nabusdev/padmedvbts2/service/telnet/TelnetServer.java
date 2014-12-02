@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.service.telnet;
-import static com.nabusdev.padmedvbts2.util.Constants.Table.ServerSetup.*;
+import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
 import com.nabusdev.padmedvbts2.util.Variable;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
@@ -7,11 +7,9 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.logging.LoggingFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import java.io.IOException;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
-import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Enumeration;

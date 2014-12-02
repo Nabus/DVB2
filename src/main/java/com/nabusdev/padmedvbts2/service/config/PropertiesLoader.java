@@ -1,11 +1,13 @@
 package com.nabusdev.padmedvbts2.service.config;
+import static com.nabusdev.padmedvbts2.util.Constants.*;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertiesLoader extends ConfigLoader {
-    private static final String PREFIX = "src\\main\\resources\\";
+    private static final String PREFIX = JAVA_EXEC_PATH + File.separator;
     private static final String SUFFIX = ".properties";
 
     public static void load(String configPath) {

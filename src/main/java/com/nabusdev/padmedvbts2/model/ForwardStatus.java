@@ -1,6 +1,6 @@
 package com.nabusdev.padmedvbts2.model;
 
-public enum ChannelStatus {
+public enum ForwardStatus {
     WAITING,
     PREPARING,
     READY,
@@ -8,4 +8,6 @@ public enum ChannelStatus {
     STOPPED,
     CLOSED,
     FAILED,
+    PROCESSED,
+    LIMIT_EXCEEDED
 }

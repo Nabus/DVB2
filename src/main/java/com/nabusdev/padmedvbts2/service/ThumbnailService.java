@@ -8,7 +8,6 @@ import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.jcodec.api.FrameGrab;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -64,7 +63,7 @@ public class ThumbnailService {
         Stream stream = channel.getStream();
         try {
             FileOutputStream fileStream = new FileOutputStream(thumbSource);
-            URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort());
+            URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort() + stream.getPath());
             URLConnection connection = url.openConnection();
             long startRecord = System.currentTimeMillis();
             int MILLIS_FACTOR = 1000;

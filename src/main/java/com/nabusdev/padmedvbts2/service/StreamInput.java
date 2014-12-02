@@ -1,8 +1,10 @@
 package com.nabusdev.padmedvbts2.service;
 import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
+import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Stream;
+import com.nabusdev.padmedvbts2.util.Variable;
 import org.apache.commons.exec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +14,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StreamInput {
-    /* TODO configurable settings Service IP, Service Port */
-    private static int servicePort = 27000;
-    private static final String SERVICE_IP = "127.0.0.1";
+    private static Integer serviceStartPort = getServiceStartPort();
+    private static final String SERVICE_IP = getServiceIp();
     private static final String CONFIG_NAME = "stream%d.conf";
     private static Map<Adapter, Executor> executors = new HashMap<>();
     private static Map<Adapter, MumuOutput> outputs = new HashMap<>();
@@ -41,9 +40,8 @@ public class StreamInput {
 
     private void writeConfig(Adapter adapter) {
         PrintWriter writer = null;
-        String configPath = JAVA_EXEC_PATH;
         String configName = String.format(CONFIG_NAME, adapter.getId());
-        try { writer = new PrintWriter(configPath + File.separator + configName, "UTF-8"); }
+        try { writer = new PrintWriter(JAVA_EXEC_PATH + File.separator + configName, "UTF-8"); }
         catch (Exception e) { e.printStackTrace(); }
         if (writer == null) return;
         writer.println("card=" + adapter.getId());
@@ -56,7 +54,7 @@ public class StreamInput {
         writer.println("multicast=0");
         writer.println("multicast_ipv4=0");
         writer.println("multicast_ipv6=0");
-        int port = servicePort++;
+        int port = serviceStartPort++;
         writer.println("port_http=" + port);
         writer.close();
         String ip = SERVICE_IP;
@@ -110,10 +108,10 @@ public class StreamInput {
                     "Info:  Main:"
             };
 
-            final String MSG_DIFFUSION_COUNT = "Diffusion 4 channels";
+            /*final String MSG_DIFFUSION_COUNT = "Diffusion 4 channels";
             final String MSG_USING_CARD = "Using DVB card \"DiBcom 7000PC\" tuner 0";
             final String MSG_TUNING_FREQ = "Tuning DVB-T to 794000000 Hz, Bandwidth: 8000000";
-            final String MSG_CHANNEL_NUMBER = "Channel number :   0, name : \"Disney Channel\"  service id 1201";
+            final String MSG_CHANNEL_NUMBER = "Channel number :   0, name : \"Disney Channel\"  service id 1201";*/
 
             for (String var : toSplit) {
                 if (line.startsWith(var)) {
@@ -142,7 +140,7 @@ public class StreamInput {
                     }
 
                     String message = "[Adapter #" + adapter.getId() + "] " + line;
-                    logger.info(message);
+                    logger.debug(message);
                     break;
                 }
             }
@@ -151,5 +149,18 @@ public class StreamInput {
         public List<String> getLines() {
             return lines;
         }
+    }
+
+    private static String getServiceIp() {
+        final String DEFAULT_SERVICE_IP = "127.0.0.1";
+        if (Variable.exist(INPUT_SERVICE_IP)) return Variable.get(INPUT_SERVICE_IP);
+        else return DEFAULT_SERVICE_IP;
+    }
+
+    private static int getServiceStartPort() {
+        if (serviceStartPort != null) return serviceStartPort;
+        final int DEFAULT_SERVICE_START_PORT = 27000;
+        if (Variable.exist(INPUT_SERVICE_START_PORT)) return Integer.valueOf(Variable.get(INPUT_SERVICE_START_PORT));
+        else return DEFAULT_SERVICE_START_PORT;
     }
 }

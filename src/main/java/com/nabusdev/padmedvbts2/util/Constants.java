@@ -1,11 +1,9 @@
 package com.nabusdev.padmedvbts2.util;
+import static com.nabusdev.padmedvbts2.util.Variable.get;
 import com.nabusdev.padmedvbts2.Main;
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
-
-import static com.nabusdev.padmedvbts2.util.Variable.get;
 
 public class Constants {
     public static final String IDENTIFICATION = get("ident");
@@ -19,6 +17,21 @@ public class Constants {
 
     public class Variables {
         public static final String LAST_CONFIGURATION_READ = "lastConfigurationRead"; // for 'CONFIG STATUS' telnet com
+        public static final String COMMAND_MANAGER_INTERFACE = "commandManagerInterface";
+        public static final String COMMAND_MANAGER_HOST = "commandManagerHost";
+        public static final String COMMAND_MANAGER_PORT = "commandManagerPort";
+        public static final String COMMAND_MANAGER_ALLOW_FROM = "commandManagerAllowFrom";
+        public static final String DB_MANAGER_HOST = "dbManagerHost";
+        public static final String DB_MANAGER_PORT = "dbManagerPort";
+        public static final String DB_MANAGER_USERNAME = "dbManagerUsername";
+        public static final String DB_MANAGER_PASSWORD = "dbManagerPassword";
+        public static final String DB_MANAGER_DATABASE = "dbManagerDatabase";
+        public static final String DB_MANAGER_PERIOD = "dbManagerPeriod";
+        public static final String DB_MANAGER_TIMEOUT = "dbManagerTimeout";
+        public static final String EPG_UPDATE_INTERVAL = "epgUpdateInterval";
+        public static final String EPG_TIMESTAMP_OFFSET = "epgTimestampOffset";
+        public static final String INPUT_SERVICE_IP = "inputServiceIp";
+        public static final String INPUT_SERVICE_START_PORT = "inputServiceStartPort";
     }
 
     public class Telnet {
@@ -37,6 +50,7 @@ public class Constants {
             public static final String CONFIG_STATUS = "CONFIG STATUS";
             public static final String DBCONN_RENEW = "DBCONN RENEW";
             public static final String DBCONN_STATUS = "DBCONN STATUS";
+            public static final String QUIT = "QUIT";
         }
     }
 
@@ -44,21 +58,15 @@ public class Constants {
 
         public class ServerSetup {
             public static final String TABLE_NAME = "dvbts2.server_setup";
+            public static final String ID = "id";
+            public static final String SERVER_ID = "server_id";
             public static final String IDENT = "ident";
             public static final String SETUP_KEY = "setup_key";
             public static final String SETUP_VALUE = "setup_value";
-
-            public static final String COMMAND_MANAGER_INTERFACE = "commandManagerInterface";
-            public static final String COMMAND_MANAGER_HOST = "commandManagerHost";
-            public static final String COMMAND_MANAGER_PORT = "commandManagerPort";
-            public static final String COMMAND_MANAGER_ALLOW_FROM = "commandManagerAllowFrom";
-            public static final String DB_MANAGER_HOST = "dbManagerHost";
-            public static final String DB_MANAGER_PORT = "dbManagerPort";
-            public static final String DB_MANAGER_USERNAME = "dbManagerUsername";
-            public static final String DB_MANAGER_PASSWORD = "dbManagerPassword";
-            public static final String DB_MANAGER_DATABASE = "dbManagerDatabase";
-            public static final String DB_MANAGER_PERIOD = "dbManagerPeriod";
-            public static final String DB_MANAGER_TIMEOUT = "dbManagerTimeout";
+            public static final String DATE_CHANGED = "date_changed";
+            public static final String USER_CHANGED = "user_changed";
+            public static final String NOTE = "note";
+            public static final String CREATED = "created";
         }
 
         public class Channels {
@@ -191,6 +199,6 @@ public class Constants {
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
-        return "";
+        return null;
     }
 }

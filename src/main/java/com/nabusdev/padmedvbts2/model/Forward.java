@@ -3,7 +3,7 @@ package com.nabusdev.padmedvbts2.model;
 public class Forward {
     private int id;
     private Channel channel;
-    private String eventType;
+    private ForwardStatus eventType;
     private String outputStreamProtocol;
     private String outputStreamHost;
     private int outputStreamPort;
@@ -33,11 +33,11 @@ public class Forward {
         this.channel = channel;
     }
 
-    public String getEventType() {
+    public ForwardStatus getEventType() {
         return eventType;
     }
 
-    public void setEventType(String eventType) {
+    public void setEventType(ForwardStatus eventType) {
         this.eventType = eventType;
     }
 

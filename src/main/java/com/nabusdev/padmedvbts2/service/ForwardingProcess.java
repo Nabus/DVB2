@@ -28,7 +28,6 @@ public class ForwardingProcess implements Runnable {
     private URLConnection getConnection() {
         int tryCount = 0;
         final int MAX_TRY_COUNT = 60;
-        final int MILLIS_IN_1SEC = 1000;
 
         while (tryCount < MAX_TRY_COUNT) {
             try {
@@ -36,8 +35,8 @@ public class ForwardingProcess implements Runnable {
                 URLConnection connection = url.openConnection();
                 return connection;
             } catch (IOException e) {
-                /* Ignoring, Sleeping for 1 sec */
                 try {
+                    final int MILLIS_IN_1SEC = 1000;
                     Thread.sleep(MILLIS_IN_1SEC);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();

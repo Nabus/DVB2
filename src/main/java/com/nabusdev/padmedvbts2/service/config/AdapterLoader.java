@@ -1,5 +1,6 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.Adapters.*;
+import static com.nabusdev.padmedvbts2.util.Constants.IDENTIFICATION;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
@@ -12,7 +13,7 @@ public class AdapterLoader {
     public static void load() {
         String query = String.format("SELECT " + ID + "," + IDENT + "," + PATH + "," + ADAPTER_TYPE + "," +
                 FREQUENCY + "," + BANDWIDTH + "," + TRANSMISSION_MODE + "," + GUARD_INTERVAL + "," + HIERARCHY +
-                MODULATION + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
+                MODULATION + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1 AND " + IDENT + " = '" + IDENTIFICATION + "';");
 
         ResultSet resultSet = db.selectSql(query);
         process(resultSet);

@@ -1,12 +1,14 @@
 package com.nabusdev.padmedvbts2.service;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.EpgProgrammes.*;
 import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
+import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
 import com.nabusdev.padmedvbts2.util.Constants.Xml.EpgResult;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Programme;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import com.nabusdev.padmedvbts2.util.Variable;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.slf4j.Logger;
@@ -25,7 +27,6 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -48,7 +49,10 @@ public class EpgCollector {
             }
         };
         final int HOUR = 3600000;
-        /* TODO Update interval as configurable setting */
+        int updateInterval = HOUR;
+        if (Variable.exist(EPG_UPDATE_INTERVAL)) {
+            updateInterval = Integer.parseInt(Variable.get(EPG_UPDATE_INTERVAL));
+        }
         timer.scheduleAtFixedRate(timerTask, HOUR, HOUR);
     }
 
@@ -330,7 +334,9 @@ public class EpgCollector {
             try {
                 Date date = dateFormat.parse(target);
                 long time = date.getTime();
-                /* TODO timestamp offset configurable setting */
+                if (Variable.exist(EPG_TIMESTAMP_OFFSET)) {
+                    time += Integer.parseInt(Variable.get(EPG_TIMESTAMP_OFFSET));
+                }
                 return time;
 
             } catch (ParseException e) {

@@ -6,7 +6,6 @@ import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 

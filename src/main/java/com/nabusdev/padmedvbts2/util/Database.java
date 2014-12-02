@@ -1,10 +1,8 @@
 package com.nabusdev.padmedvbts2.util;
+import static com.nabusdev.padmedvbts2.util.Constants.*;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import java.sql.*;
-
-import static com.nabusdev.padmedvbts2.util.Constants.*;
-import static com.nabusdev.padmedvbts2.util.Variable.get;
 
 public class Database {
     private String host;

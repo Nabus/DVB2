@@ -18,7 +18,7 @@ public class Channel {
     private int thumbSavePeriod = 15000;
     private String thumbSaveFormat = "JPEG";
     private Stream stream;
-    private ChannelStatus status;
+    private ChannelStatus status = ChannelStatus.WAITING;
     private List<Forward> forwards = new ArrayList<>();
     private static Map<Integer, Channel> channels = new HashMap<>();
     private static Database db = DatabaseProvider.getChannelsDB();

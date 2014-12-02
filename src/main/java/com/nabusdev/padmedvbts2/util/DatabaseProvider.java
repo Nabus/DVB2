@@ -26,11 +26,11 @@ public class DatabaseProvider {
                 localInstance = channelsDB;
                 if (localInstance == null) {
                     channelsDB = localInstance = new Database(
-                            get(Constants.Table.ServerSetup.DB_MANAGER_HOST),
-                            get(Constants.Table.ServerSetup.DB_MANAGER_PORT),
-                            get(Constants.Table.ServerSetup.DB_MANAGER_DATABASE),
-                            get(Constants.Table.ServerSetup.DB_MANAGER_USERNAME),
-                            get(Constants.Table.ServerSetup.DB_MANAGER_PASSWORD));
+                            get(Constants.Variables.DB_MANAGER_HOST),
+                            get(Constants.Variables.DB_MANAGER_PORT),
+                            get(Constants.Variables.DB_MANAGER_DATABASE),
+                            get(Constants.Variables.DB_MANAGER_USERNAME),
+                            get(Constants.Variables.DB_MANAGER_PASSWORD));
                 }
             }
         }
