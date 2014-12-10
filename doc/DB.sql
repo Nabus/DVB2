@@ -162,7 +162,7 @@ CREATE TABLE adm.clusters (
 );
 
 /*
-Settings for cluster, for example JMS_TYPE (ACTIVEMQ), JMS_JNDI (connection string), JMS_QUEUE (SAFIX_ACTIVITY_MAIN), and so on.
+Settings for cluster, for example JMS_TYPE (ACTIVEMQ), JMS_JNDI (connection string), JMS_QUEUE (DVBTS2_ACTIVITY_MAIN), and so on.
 */
 CREATE TABLE adm.cluster_setup (
 	id SERIAL,
