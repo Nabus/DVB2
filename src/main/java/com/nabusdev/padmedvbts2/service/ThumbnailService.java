@@ -45,22 +45,24 @@ public class ThumbnailService {
     }
 
     private void createThumb(Channel channel) {
-        setTimer(channel);
         String pathToSave = channel.getThumbPath();
         SimpleDateFormat dateFormat = new SimpleDateFormat(channel.getThumbFilenamePattern());
         String fileName = dateFormat.format(new Date());
         String format = getValidFormat(channel.getThumbSaveFormat());
         int fileSize = saveThumbnail(channel, pathToSave, fileName, format);
-        String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +
-                SIZE + "," + FORMAT + "," + ACTIVE + "," + DATE_CREATED + ") VALUES (" + channel.getId() + ",'" +
-                pathToSave + "','" + fileName + "'," + fileSize + ",'" + format + "');";
-        db.execSql(query);
+        if (fileSize > 0) {
+            String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +
+                    SIZE + "," + FORMAT + "," + ACTIVE + "," + DATE_CREATED + ") VALUES (" + channel.getId() + ",'" +
+                    pathToSave + "','" + fileName + "'," + fileSize + ",'" + format + "', 1, now());";
+            db.execSql(query);
+        }
     }
 
     private int saveThumbnail(Channel channel, String pathToSave, String fileName, String format) {
         File thumbSource = new File(JAVA_EXEC_PATH + File.separator + "thumbSource.video");
         if (thumbSource.exists()) thumbSource.delete();
         Stream stream = channel.getStream();
+        if (stream == null) return 0;
         try {
             FileOutputStream fileStream = new FileOutputStream(thumbSource);
             URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort() + stream.getPath());
@@ -74,17 +76,24 @@ public class ThumbnailService {
                     fileStream.write(arr, 0, readByte);
                 }
             }
+            fileStream.flush();
             fileStream.close();
-            File thumbFile;
             int FRAME_NUMBER = 1;
             BufferedImage frame = FrameGrab.getFrame(thumbSource, FRAME_NUMBER);
-            ImageIO.write(frame, format, thumbFile = new File(pathToSave + File.separator + fileName + "." + format));
+            File thumbFile = new File(pathToSave + File.separator + fileName + "." + format);
+            ImageIO.write(frame, format, thumbFile);
+            if (thumbSource.exists()) thumbSource.delete();
             return (int) thumbFile.length();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            return 0;
+
+        } finally {
+            if (thumbSource.exists()) {
+                thumbSource.delete();
+            }
         }
-        return 0;
     }
 
     private static String getValidFormat(String format) {

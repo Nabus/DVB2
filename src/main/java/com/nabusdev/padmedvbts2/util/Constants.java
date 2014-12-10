@@ -6,14 +6,20 @@ import java.net.URISyntaxException;
 import java.security.CodeSource;
 
 public class Constants {
-    public static final String IDENTIFICATION = get("ident");
-    public static final String DB_USER = get("dbUser");
-    public static final String DB_PASSWORD = get("dbPassword");
-    public static final String DB_HOST = get("dbHost");
-    public static final String DB_PORT = get("dbPort");
-    public static final String DB_TYPE = get("dbType");
-    public static final String DB_NAME = get("dbName");
     public static final String JAVA_EXEC_PATH = getJavaExecutablePath();
+    public static final String MUMUDVB_PATH = getJavaExecutablePath() + File.separator + "tools" + File.separator + "mumudvb" + File.separator + "mumudvb";
+    public static final String TVGRAB_PATH = getJavaExecutablePath() + File.separator + "tools" + File.separator + "tv_grab_dvb_plus" + File.separator + "tv_grab_dvb_plus";
+
+    public class Config {
+        // When called from outside must be enclosed in Variable.get(<name>)
+        public static final String IDENTIFICATION = "ident";
+        public static final String DB_USER = "dbUser";
+        public static final String DB_PASSWORD = "dbPassword";
+        public static final String DB_HOST = "dbHost";
+        public static final String DB_PORT = "dbPort";
+        public static final String DB_TYPE = "dbType";
+        public static final String DB_NAME = "dbName";
+    }
 
     public class Variables {
         public static final String LAST_CONFIGURATION_READ = "lastConfigurationRead"; // for 'CONFIG STATUS' telnet com
@@ -117,8 +123,8 @@ public class Constants {
             public static final String OUTPUT_STREAM_USERNAME = "output_stream_username";
             public static final String OUTPUT_STREAM_PASSWORD = "output_stream_password";
             public static final String OUTPUT_STREAM_URL_PATH = "output_stream_url_path";
-            public static final String OUTPUT_STREAM_TIMEOUT = "output_stream_client_limit";
-            public static final String OUTPUT_STREAM_CLIENT_LIMIT = "date_streaming_start";
+            public static final String OUTPUT_STREAM_TIMEOUT = "output_stream_timeout";
+            public static final String OUTPUT_STREAM_CLIENT_LIMIT = "output_stream_client_limit";
             public static final String DATA_STREAMING_START = "date_streaming_start";
             public static final String DATA_STREAMING_STOP = "date_streaming_stop";
             public static final String DATA_STREAMING_FAILED = "date_streaming_failed";

@@ -2,6 +2,8 @@ package com.nabusdev.padmedvbts2;
 import com.nabusdev.padmedvbts2.service.telnet.TelnetServer;
 import com.nabusdev.padmedvbts2.service.config.*;
 import com.nabusdev.padmedvbts2.service.*;
+import com.nabusdev.padmedvbts2.util.Constants;
+import com.nabusdev.padmedvbts2.util.Variable;
 
 public class Main {
 

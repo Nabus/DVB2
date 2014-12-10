@@ -10,6 +10,7 @@ import java.util.Map;
 public class Adapter {
     private int id;
     private String path;
+    private int pathId;
     private String ident;
     private String adapterType;
     private int frequency;
@@ -27,6 +28,7 @@ public class Adapter {
        this.id = id;
        this.path = path;
        this.ident = ident;
+       this.pathId = Integer.parseInt(path.replaceAll("\\D+",""));
        adapters.put(id, this);
     }
 
@@ -40,6 +42,10 @@ public class Adapter {
             adapterList.add(adapter);
         }
         return adapterList;
+    }
+
+    public int getPathId(){
+        return pathId;
     }
 
     public void addChannel(Channel channel) {
@@ -70,7 +76,7 @@ public class Adapter {
         this.hierarchy = hierarchy;
     }
 
-    public int getId(){
+    public int getId() {
         return id;
     }
 
@@ -91,15 +97,15 @@ public class Adapter {
     }
 
     public void notifyStartUsing() {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = UNIX_TIMESTAMP();");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = now();");
     }
 
     public void notifyStopUsing() {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = UNIX_TIMESTAMP();");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = now();");
     }
 
     public void notifyFailOccurred(String failedMessage) {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = UNIX_TIMESTAMP(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = now(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
     }
 
     public int getServicePort() {

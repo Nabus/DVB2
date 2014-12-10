@@ -1,9 +1,10 @@
 package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.Adapters.*;
-import static com.nabusdev.padmedvbts2.util.Constants.IDENTIFICATION;
 import com.nabusdev.padmedvbts2.model.Adapter;
+import com.nabusdev.padmedvbts2.util.Constants;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
+import com.nabusdev.padmedvbts2.util.Variable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -11,8 +12,9 @@ public class AdapterLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
 
     public static void load() {
+        final String IDENTIFICATION = Variable.get(Constants.Config.IDENTIFICATION);
         String query = String.format("SELECT " + ID + "," + IDENT + "," + PATH + "," + ADAPTER_TYPE + "," +
-                FREQUENCY + "," + BANDWIDTH + "," + TRANSMISSION_MODE + "," + GUARD_INTERVAL + "," + HIERARCHY +
+                FREQUENCY + "," + BANDWIDTH + "," + TRANSMISSION_MODE + "," + GUARD_INTERVAL + "," + HIERARCHY + "," +
                 MODULATION + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1 AND " + IDENT + " = '" + IDENTIFICATION + "';");
 
         ResultSet resultSet = db.selectSql(query);

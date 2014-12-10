@@ -1,6 +1,7 @@
 package com.nabusdev.padmedvbts2.service;
 import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
 import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
+import static com.nabusdev.padmedvbts2.util.Constants.*;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Stream;
@@ -40,16 +41,17 @@ public class StreamInput {
 
     private void writeConfig(Adapter adapter) {
         PrintWriter writer = null;
-        String configName = String.format(CONFIG_NAME, adapter.getId());
+        String configName = String.format(CONFIG_NAME, adapter.getPathId());
         try { writer = new PrintWriter(JAVA_EXEC_PATH + File.separator + configName, "UTF-8"); }
         catch (Exception e) { e.printStackTrace(); }
         if (writer == null) return;
-        writer.println("card=" + adapter.getId());
+        writer.println("card=" + adapter.getPathId());
         final int GHZ_TO_MHZ = 1000;
         int frequency = adapter.getFrequency() / GHZ_TO_MHZ;
         writer.println("freq=" + frequency);
         writer.println("bandwidth=" + adapter.getBandwidth() + "MHz");
         writer.println("delivery_system=" + adapter.getAdapterType());
+        writer.println("autoconfiguration=full");
         writer.println("unicast=1");
         writer.println("multicast=0");
         writer.println("multicast_ipv4=0");
@@ -75,8 +77,8 @@ public class StreamInput {
 
         public void run() {
             try {
-                String configName = String.format(CONFIG_NAME, adapter.getId());
-                String line = "mumudvb -d -c " + JAVA_EXEC_PATH + File.separator + configName;
+                String configName = String.format(CONFIG_NAME, adapter.getPathId());
+                String line = MUMUDVB_PATH + " -d -c " + JAVA_EXEC_PATH + File.separator + configName;
                 CommandLine cmdLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 executor.setWatchdog(new ExecuteWatchdog(ExecuteWatchdog.INFINITE_TIMEOUT));
@@ -101,17 +103,16 @@ public class StreamInput {
         @Override protected void processLine(String line, int level) {
             lines.add(line);
 
-            /* TODO */
             final String[] toSplit = {
                     "Info:  Autoconf:",
                     "Info:  Tune:",
                     "Info:  Main:"
             };
 
-            /*final String MSG_DIFFUSION_COUNT = "Diffusion 4 channels";
-            final String MSG_USING_CARD = "Using DVB card \"DiBcom 7000PC\" tuner 0";
-            final String MSG_TUNING_FREQ = "Tuning DVB-T to 794000000 Hz, Bandwidth: 8000000";
-            final String MSG_CHANNEL_NUMBER = "Channel number :   0, name : \"Disney Channel\"  service id 1201";*/
+            final String[] ignoreMessages = {
+                    "Channel number :",
+                    "Unicast : Channel"
+            };
 
             for (String var : toSplit) {
                 if (line.startsWith(var)) {
@@ -128,19 +129,30 @@ public class StreamInput {
                         String name = line.split("\"")[1];
                         for (Channel channel : adapter.getChannels()) {
                             if (channel.getName().equals(name)) {
-                                logger.info("Streaming channel \"" + name + "\"");
-                                int serviceId = Integer.parseInt(line.split("service id ")[0]);
+                                final String[] split = line.split(" ");
+                                int serviceId = Integer.parseInt(split[split.length - 1]);
                                 Stream stream = new Stream();
                                 stream.setServiceId(serviceId);
                                 stream.setChannel(channel);
-                                new ForwardingProcess(stream);
+                                stream.setPath("/bysid/" + serviceId);
+                                channel.setStream(stream);
                                 channel.notifyStartUsing();
+                                new Thread(new ForwardingProcess(stream)).start();
+                                logger.info("Streaming channel \"" + name + "\"");
                             }
                         }
                     }
 
-                    String message = "[Adapter #" + adapter.getId() + "] " + line;
-                    logger.debug(message);
+                    boolean printMessage = true;
+                    for (String msg : ignoreMessages) {
+                        if (line.startsWith(msg)) printMessage = false;
+                    }
+
+                    if (printMessage) {
+                        String message = "[Adapter #" + adapter.getPathId() + "] " + line;
+                        logger.debug(message);
+                    }
+
                     break;
                 }
             }

@@ -9,6 +9,7 @@ import java.util.Map;
 public class Client {
     private int clientID;
     private Socket channel;
+    private int writeErrorCount;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
     private static volatile int clientLastID = 0;
@@ -52,5 +53,17 @@ public class Client {
 
     public Socket getChannel() {
         return channel;
+    }
+
+    public void increaseWriteErrorCount() {
+        writeErrorCount++;
+    }
+
+    public void resetWriteErrorCount() {
+        writeErrorCount = 0;
+    }
+
+    public int getWriteErrorCount() {
+        return writeErrorCount;
     }
 }

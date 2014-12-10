@@ -1,5 +1,5 @@
 package com.nabusdev.padmedvbts2.util;
-import static com.nabusdev.padmedvbts2.util.Constants.*;
+import com.nabusdev.padmedvbts2.util.Constants.Config;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import java.sql.*;
@@ -24,6 +24,7 @@ public class Database {
     public void connect(){
         try {
             Class.forName("org.postgresql.Driver");
+            final String DB_TYPE = Variable.get(Config.DB_TYPE);
             String connectionLink = "jdbc:" + DB_TYPE + "://" + host + ":" + port + "/" + database;
             connection = DriverManager.getConnection(connectionLink, dbUser, dbPassword);
         } catch (ClassNotFoundException e) {

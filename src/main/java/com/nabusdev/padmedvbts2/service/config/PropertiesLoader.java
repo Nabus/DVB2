@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class PropertiesLoader extends ConfigLoader {
-    private static final String PREFIX = JAVA_EXEC_PATH + File.separator;
+    private static final String PREFIX = JAVA_EXEC_PATH + File.separator + "resources" + File.separator;
     private static final String SUFFIX = ".properties";
 
     public static void load(String configPath) {

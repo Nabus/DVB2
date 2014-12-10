@@ -56,11 +56,6 @@
             <artifactId>jcodec</artifactId>
             <version>0.1.5</version>
         </dependency>
-        <dependency>
-            <groupId>xuggle</groupId>
-            <artifactId>xuggle-xuggler</artifactId>
-            <version>5.2</version>
-        </dependency>
     </dependencies>
 
 </project>

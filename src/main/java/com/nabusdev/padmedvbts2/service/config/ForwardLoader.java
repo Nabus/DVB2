@@ -2,6 +2,7 @@ package com.nabusdev.padmedvbts2.service.config;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.StreamForward.*;
 import com.nabusdev.padmedvbts2.model.Channel;
 import com.nabusdev.padmedvbts2.model.Forward;
+import com.nabusdev.padmedvbts2.model.ForwardStatus;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import org.slf4j.Logger;
@@ -28,7 +29,7 @@ public class ForwardLoader {
             while (resultSet.next()) {
                 int id = resultSet.getInt(ID);
                 int channelId = resultSet.getInt(CHANNEL_ID);
-                String eventType = resultSet.getString(EVENT_TYPE);
+                ForwardStatus eventType = getForwardStatus(channelId, resultSet.getString(EVENT_TYPE));
                 String outputStreamProtocol = resultSet.getString(OUTPUT_STREAM_PROTOCOL);
                 String outputStreamHost = resultSet.getString(OUTPUT_STREAM_HOST);
                 int outputStreamPort = resultSet.getInt(OUTPUT_STREAM_PORT);
@@ -56,5 +57,15 @@ public class ForwardLoader {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static ForwardStatus getForwardStatus(int channelId, String eventType) {
+        try {
+            return ForwardStatus.valueOf(eventType);
+        } catch (Exception e) {
+            logger.error("Incorrect argument for column '" + EVENT_TYPE + "', Channel ID: " + channelId);
+            e.printStackTrace();
+        }
+        return ForwardStatus.FAILED;
     }
 }

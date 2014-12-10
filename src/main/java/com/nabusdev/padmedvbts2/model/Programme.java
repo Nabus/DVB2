@@ -2,6 +2,7 @@ package com.nabusdev.padmedvbts2.model;
 
 public class Programme {
     private int channelId;
+    private int channelPnrId;
     private long start;
     private long stop;
     private String title;
@@ -28,6 +29,14 @@ public class Programme {
 
     public void setChannelId(int channelId) {
         this.channelId = channelId;
+    }
+
+    public int getChannelPnrId() {
+        return channelPnrId;
+    }
+
+    public void setChannelPnrId(int channelPnrId) {
+        this.channelPnrId = channelPnrId;
     }
 
     public long getStart() {

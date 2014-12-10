@@ -12,7 +12,12 @@ public class DatabaseProvider {
             synchronized (DatabaseProvider.class) {
                 localInstance = configDB;
                 if (localInstance == null) {
-                    configDB = localInstance = new Database(DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD);
+                    configDB = localInstance = new Database(
+                            get(Constants.Config.DB_HOST),
+                            get(Constants.Config.DB_PORT),
+                            get(Constants.Config.DB_NAME),
+                            get(Constants.Config.DB_USER),
+                            get(Constants.Config.DB_PASSWORD));
                 }
             }
         }

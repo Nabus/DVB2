@@ -1,7 +1,7 @@
 package com.nabusdev.padmedvbts2.service.config;
-import static com.nabusdev.padmedvbts2.util.Constants.IDENTIFICATION;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.ServerSetup.*;
 import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
+import com.nabusdev.padmedvbts2.util.Constants.Config;
 import com.nabusdev.padmedvbts2.util.Database;
 import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 import com.nabusdev.padmedvbts2.util.Variable;
@@ -18,6 +18,7 @@ public class DatabaseLoader extends ConfigLoader {
     private static Logger logger = LoggerFactory.getLogger(DatabaseLoader.class);
 
     public static void load() {
+        final String IDENTIFICATION = Variable.get(Config.IDENTIFICATION);
         Variable.set(LAST_CONFIGURATION_READ, String.valueOf(new Date().getTime()));
         String query = String.format("SELECT %s, %s FROM %s WHERE %s LIKE '%s';",
                 SETUP_KEY, SETUP_VALUE, TABLE_NAME, IDENT, IDENTIFICATION);

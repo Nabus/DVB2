@@ -28,6 +28,7 @@ public class StreamOutput {
     }
 
     private void startHttpServer(Forward forward) {
+        logger.info("Starting HTTP Forward ID: " + forward.getId());
         ForwardProcess forwardProcess = new HttpServer(forward);
         new Thread((HttpServer) forwardProcess).start();
         processes.put(forward, forwardProcess);

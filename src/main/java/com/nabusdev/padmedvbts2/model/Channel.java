@@ -32,6 +32,15 @@ public class Channel {
         channels.put(id, this);
     }
 
+    public static Channel getByPndId(int pnrId) {
+        for (Channel channel : channels.values()) {
+            if (pnrId == channel.getPnrId()) {
+                return channel;
+            }
+        }
+        return null;
+    }
+
     public static Channel getById(int id) {
         return channels.get(id);
     }
@@ -112,15 +121,19 @@ public class Channel {
         this.status = status;
     }
 
+    public int getPnrId() {
+        return pnrId;
+    }
+
     public void notifyStartUsing() {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = UNIX_TIMESTAMP();");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_START + " = now();");
     }
 
     public void notifyStopUsing() {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = UNIX_TIMESTAMP();");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_STOP + " = now();");
     }
 
     public void notifyFailOccurred(String failedMessage) {
-        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = UNIX_TIMESTAMP(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
+        db.execSql("UPDATE " + TABLE_NAME + " SET " + DATE_FAILED + " = now(), " + FAILED_MESSAGE + " = '" + failedMessage + "';");
     }
 }

@@ -1,7 +1,7 @@
 package com.nabusdev.padmedvbts2.service;
 import static com.nabusdev.padmedvbts2.util.Constants.Table.EpgProgrammes.*;
-import static com.nabusdev.padmedvbts2.util.Constants.JAVA_EXEC_PATH;
 import static com.nabusdev.padmedvbts2.util.Constants.Variables.*;
+import static com.nabusdev.padmedvbts2.util.Constants.*;
 import com.nabusdev.padmedvbts2.util.Constants.Xml.EpgResult;
 import com.nabusdev.padmedvbts2.model.Adapter;
 import com.nabusdev.padmedvbts2.model.Channel;
@@ -20,17 +20,16 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 public class EpgCollector {
     public static EpgCollector INSTANCE = new EpgCollector();
@@ -53,17 +52,18 @@ public class EpgCollector {
         if (Variable.exist(EPG_UPDATE_INTERVAL)) {
             updateInterval = Integer.parseInt(Variable.get(EPG_UPDATE_INTERVAL));
         }
-        timer.scheduleAtFixedRate(timerTask, HOUR, HOUR);
+        timer.scheduleAtFixedRate(timerTask, updateInterval, updateInterval);
     }
 
     class EpgCollectorHandler implements Runnable {
         public void run() {
             for (Adapter adapter : Adapter.getAdapterList()) {
                 grabEpgToXml(adapter);
+                fixUnclosedTags();
                 List<Integer> pnrList = getNeededPnrList(adapter);
                 List<Programme> programmes = readResultXml(pnrList);
                 if (programmes.isEmpty()) {
-                    String errorMessage = "Unable to get event data from multiplex. Adapter #" + adapter.getId();
+                    String errorMessage = "Unable to get event data from multiplex. Adapter #" + adapter.getPathId();
                     adapter.notifyFailOccurred(errorMessage);
                     logger.error(errorMessage);
                 } else {
@@ -75,18 +75,71 @@ public class EpgCollector {
         private List<Integer> getNeededPnrList(Adapter adapter) {
             List<Integer> pnrList = new ArrayList<>();
             for (Channel channel : adapter.getChannels()) {
-                pnrList.add(channel.getId());
+                pnrList.add(channel.getPnrId());
             }
             return pnrList;
         }
 
         private void grabEpgToXml(Adapter adapter) {
             try {
-                String line = "tv_grab_dvb_plus --timeout 10 --adapter " + adapter.getId() + " --output " + JAVA_EXEC_PATH + File.separator + EpgResult.XML_PATH;
+                logger.info("Starting grabbing EPG tool...");
+                String xmlPath = JAVA_EXEC_PATH + File.separator + EpgResult.XML_PATH;
+                String line = TVGRAB_PATH + " --timeout 10 --adapter " + adapter.getPathId() + " --output " + xmlPath;
                 CommandLine cmdLine = CommandLine.parse(line);
                 DefaultExecutor executor = new DefaultExecutor();
                 executor.execute(cmdLine);
 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        private void fixUnclosedTags() {
+            try {
+                int counter = 0;
+                Path xmlPath = Paths.get(EpgResult.XML_PATH);
+                List<String> lines = Files.readAllLines(xmlPath);
+                String tempFileName = EpgResult.XML_PATH + ".fixed";
+                BufferedWriter writer = new BufferedWriter(new FileWriter(tempFileName));
+                boolean isOpened = false;
+                for (String line : lines) {
+                    String trim = line.trim();
+                    if (trim.startsWith("<desc")) {
+                        if (!line.endsWith("</desc>")) {
+                            counter++;
+                            if (line.endsWith("</programme>")) {
+                                line = line.replace("</programme>", "</desc></programme>");
+                            } else {
+                                line = line + "</desc>";
+                            }
+                        }
+                    } else {
+                        if (trim.startsWith("<programme")) {
+                            if (isOpened) {
+                                line = "</programme>" + line;
+                                counter++;
+                            } else {
+                                isOpened = true;
+                            }
+                        } else if (trim.startsWith("</programme>")) {
+                            if (isOpened) {
+                                isOpened = false;
+                            } else {
+                                line = "<programme channel=\"0.dvb.guide\" start=\"0\" stop=\"0\">" + line;
+                                counter++;
+                            }
+                        }
+                    }
+                    writer.write(line + System.lineSeparator());
+                }
+                writer.close();
+                logger.debug("Fixed " + counter + " unclosed tags");
+                File fixedFile = new File(tempFileName);
+                if (fixedFile.exists()) {
+                    File xmlFile = new File(EpgResult.XML_PATH);
+                    if (xmlFile.exists()) xmlFile.delete();
+                    fixedFile.renameTo(xmlFile);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -117,8 +170,8 @@ public class EpgCollector {
                                 if (attributeName.equals(EpgResult.CHANNEL)) {
                                     String channel = attribute.getValue();
                                     int channelPnr = Integer.parseInt(channel.replace(".dvb.guide", ""));
-                                    if (allowedPnrList.contains(channelPnr) == false) break allowedBreak;
-                                    programme.setChannelId(channelPnr);
+                                    if (!allowedPnrList.contains(channelPnr)) break allowedBreak;
+                                    programme.setChannelPnrId(channelPnr);
                                 } else if (attributeName.equals(EpgResult.START)) {
                                     String startStr = attribute.getValue();
                                     long start = parseEpgXmlDate(startStr);
@@ -262,14 +315,18 @@ public class EpgCollector {
             Map<Integer, Long> latestDates = new HashMap<>();
             for (Programme programme : programmes) {
                 long latestStartDate = 0L;
-                int channelId = programme.getChannelId();
-                if (latestDates.containsKey(channelId)) {
-                    latestStartDate = latestDates.get(channelId);
+                int channelPnrId = programme.getChannelPnrId();
+                if (latestDates.containsKey(channelPnrId)) {
+                    latestStartDate = latestDates.get(channelPnrId);
                 } else {
                     latestStartDate = getLatestStartDate(programme);
-                    latestDates.put(channelId, latestStartDate);
+                    latestDates.put(channelPnrId, latestStartDate);
                 }
+                //System.out.println("programme.getStart ["+programme.getStart()+"] || latestStartDate ["+latestStartDate+"]");
                 if (programme.getStart() > latestStartDate) {
+                    Channel channel = Channel.getByPndId(channelPnrId);
+                    if (channel == null) continue;
+                    int channelId = channel.getId();
                     long dateStart = programme.getStart();
                     long dateStop = programme.getStop();
                     String title = programme.getTitle();
@@ -285,27 +342,44 @@ public class EpgCollector {
                     String ratingValue = programme.getRatingValue();
                     String subtitlesType = programme.getSubtitlesType();
                     String subtitlesLang = programme.getSubtitlesLanguage();
-                    String query = "INSERT INTO " + TABLE_NAME + "VALUES (NULL, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
+                    String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + DATE_START + "," + DATE_STOP + "," + DATE_MAKE + "," +
+                            TITLE + "," + TITLE_LANG + "," + SUBTITLE + "," + SUBTITLE_LANG + "," + DESCRIPTION + "," +
+                            DESCRIPTION_LANG + "," + LANG + "," + VIDEO_ASPECT + "," + AUDIO + "," + RATING_SYSTEM + "," +
+                            RATING_VALUE + "," + SUBTITLES_TYPE + "," + SUBTITLES_LANG + "," + ACTIVE + ") " +
+                            "VALUES (?, ?, ?, now(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
                     PreparedStatement statement = db.getPrepareStatement(query);
                     try {
                         int counter = 0;
-                        statement.setLong(++counter, dateStart);
-                        statement.setLong(++counter, dateStop);
-                        statement.setString(++counter, title);
-                        statement.setString(++counter, titleLang);
-                        statement.setString(++counter, subTitle);
-                        statement.setString(++counter, subTitleLang);
-                        statement.setString(++counter, description);
-                        statement.setString(++counter, descriptionLang);
-                        statement.setString(++counter, lang);
-                        statement.setString(++counter, videoAspect);
-                        statement.setString(++counter, audio);
-                        statement.setString(++counter, ratingSystem);
-                        statement.setString(++counter, ratingValue);
-                        statement.setString(++counter, subtitlesType);
-                        statement.setString(++counter, subtitlesLang);
+                        statement.setInt(++counter, channelId);
+                        statement.setTimestamp(++counter, new Timestamp(dateStart));
+                        statement.setTimestamp(++counter, new Timestamp(dateStop));
+                        if (title == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, title);
+                        if (titleLang == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, titleLang);
+                        if (subTitle == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, subTitle);
+                        if (subTitleLang == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, subTitleLang);
+                        if (description == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, description);
+                        if (descriptionLang == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, descriptionLang);
+                        if (lang == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, lang);
+                        if (videoAspect == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, videoAspect);
+                        if (audio == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, audio);
+                        if (ratingSystem == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, ratingSystem);
+                        if (ratingValue == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, ratingValue);
+                        if (subtitlesType == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, subtitlesType);
+                        if (subtitlesLang == null) statement.setNull(++counter, Types.NULL);
+                        else statement.setString(++counter, subtitlesLang);
                         statement.executeUpdate();
-
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
@@ -316,13 +390,16 @@ public class EpgCollector {
         private long getLatestStartDate(Programme programme) {
             try {
                 String query = "SELECT " + DATE_START + " FROM " + TABLE_NAME + " WHERE " +
-                        CHANNEL_ID + " = " + programme.getChannelId() + " ORDER BY " + DATE_START + "DESC LIMIT 1";
+                        CHANNEL_ID + " = " + programme.getChannelId() + " ORDER BY " + DATE_START + " DESC LIMIT 1";
                 ResultSet resultSet = db.selectSql(query);
                 while (resultSet.next()) {
-                    final int COLUMN_INDEX = 1;
-                    return resultSet.getLong(COLUMN_INDEX);
+                    String result = resultSet.getString(DATE_START);
+                    final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+                    DateFormat dateFormat = new SimpleDateFormat(PATTERN);
+                    Date date = dateFormat.parse(result);
+                    return date.getTime();
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return -1;
@@ -330,7 +407,9 @@ public class EpgCollector {
 
         private long parseEpgXmlDate(String xmlDate) {
             String target = xmlDate.split(" ")[0]; // Cutting ' +0100' from source xml date
-            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddkkmmssSS");
+            target = target.substring(0, target.length() - 2); // Cutting milliseconds
+            final String PATTERN = "yyyyMMddHHmm";
+            DateFormat dateFormat = new SimpleDateFormat(PATTERN);
             try {
                 Date date = dateFormat.parse(target);
                 long time = date.getTime();

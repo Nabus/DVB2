@@ -49,26 +49,50 @@ public class HttpServer implements Runnable, ForwardProcess {
             while (!network.isClosed()) {
                 Socket socket = network.accept();
                 Client client = new Client(socket);
-                Stream stream = forward.getChannel().getStream();
-                writeResponse(client);
-                stream.addClient(client);
+                boolean isReadyToAccept = (forward.getChannel().getStream() != null);
+
+                if (isReadyToAccept) {
+                    new Thread(new AcceptClient(client, forward)).start();
+                } else {
+                    logger.debug("Client dropped. Not ready to accept.");
+                    client.getChannel().close();
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void writeResponse(Client client) {
-        String response = "HTTP/1.1 200 OK\r\n" +
-                "Server: PadmeDVBTS2\r\n" +
-                "Content-Type: video/mpeg\r\n" +
-                "Connection: close\r\n\r\n";
-        try {
-            OutputStream outputStream = client.getDataOutputStream();
-            outputStream.write(response.getBytes());
-            outputStream.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
+    class AcceptClient implements Runnable {
+        private Client client;
+        private Forward forward;
+
+        AcceptClient(Client client, Forward forward) {
+            this.client = client;
+            this.forward = forward;
+        }
+
+        public void run() {
+            final String clientIp = client.getChannel().getInetAddress().toString().replace("/", "");
+            logger.info("Client " + clientIp + " connected to forward ID: " + forward.getId() + " channel ID: " + forward.getChannel().getId());
+            writeResponse(client);
+            Stream stream = forward.getChannel().getStream();
+            stream.addClient(client);
+        }
+
+        private void writeResponse(Client client) {
+            String response = "HTTP/1.1 200 OK\r\n" +
+                    "Server: PadmeDVBTS2\r\n" +
+                    "Content-Type: video/mpeg\r\n" +
+                    "Connection: close\r\n\r\n";
+            try {
+                OutputStream outputStream = client.getDataOutputStream();
+                outputStream.write(response.getBytes());
+                outputStream.flush();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

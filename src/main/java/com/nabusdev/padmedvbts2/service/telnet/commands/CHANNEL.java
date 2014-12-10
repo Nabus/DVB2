@@ -60,7 +60,7 @@ public class Channel implements CommandsCase {
         table.append("------------------------------------\n");
         for (com.nabusdev.padmedvbts2.model.Channel channel : com.nabusdev.padmedvbts2.model.Channel.getChannelList()) {
             int channelId = channel.getId();
-            int adapterId = channel.getAdapter().getId();
+            int adapterId = channel.getAdapter().getPathId();
             String status = channel.getStatus().name();
             table.append(String.format("%-5d %-5d %s%n", channelId, adapterId, status));
         }
