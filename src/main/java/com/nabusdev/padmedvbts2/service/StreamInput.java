@@ -137,7 +137,7 @@ public class StreamInput {
                                 stream.setPath("/bysid/" + serviceId);
                                 channel.setStream(stream);
                                 channel.notifyStartUsing();
-                                new Thread(new ForwardingProcess(stream)).start();
+                                new Thread(new ForwardReader(stream)).start();
                                 logger.info("Streaming channel \"" + name + "\"");
                             }
                         }

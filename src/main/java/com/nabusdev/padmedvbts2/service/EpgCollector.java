@@ -67,7 +67,9 @@ public class EpgCollector {
                     adapter.notifyFailOccurred(errorMessage);
                     logger.error(errorMessage);
                 } else {
-                    persist(programmes);
+                    int savedCount = persist(programmes);
+                    if (savedCount == 0) logger.info("No new EPG data available to save");
+                    else logger.info("Successfully saved " + savedCount + " EPG programmes to DB");
                 }
             }
         }
@@ -96,40 +98,32 @@ public class EpgCollector {
 
         private void fixUnclosedTags() {
             try {
+                int lineNum = 0;
                 int counter = 0;
                 Path xmlPath = Paths.get(EpgResult.XML_PATH);
                 List<String> lines = Files.readAllLines(xmlPath);
                 String tempFileName = EpgResult.XML_PATH + ".fixed";
                 BufferedWriter writer = new BufferedWriter(new FileWriter(tempFileName));
-                boolean isOpened = false;
+                boolean isDescOpened = false;
+
                 for (String line : lines) {
+                    lineNum++;
+                    if (lineNum == 1 || lineNum == 2) continue;
                     String trim = line.trim();
-                    if (trim.startsWith("<desc")) {
-                        if (!line.endsWith("</desc>")) {
+
+                    if (trim.contains("<desc")) isDescOpened = true;
+                    if (trim.contains("</desc>")) isDescOpened = false;
+                    if (trim.contains("</programme>")) {
+                        if (isDescOpened) {
+                            line.replace("</programme>", "</desc></programme>");
                             counter++;
-                            if (line.endsWith("</programme>")) {
-                                line = line.replace("</programme>", "</desc></programme>");
-                            } else {
-                                line = line + "</desc>";
-                            }
-                        }
-                    } else {
-                        if (trim.startsWith("<programme")) {
-                            if (isOpened) {
-                                line = "</programme>" + line;
-                                counter++;
-                            } else {
-                                isOpened = true;
-                            }
-                        } else if (trim.startsWith("</programme>")) {
-                            if (isOpened) {
-                                isOpened = false;
-                            } else {
-                                line = "<programme channel=\"0.dvb.guide\" start=\"0\" stop=\"0\">" + line;
-                                counter++;
-                            }
                         }
                     }
+
+                    if (trim.contains("<desc") && trim.contains("</programme>")) {
+                        line = "</programme>";
+                    }
+
                     writer.write(line + System.lineSeparator());
                 }
                 writer.close();
@@ -172,6 +166,8 @@ public class EpgCollector {
                                     int channelPnr = Integer.parseInt(channel.replace(".dvb.guide", ""));
                                     if (!allowedPnrList.contains(channelPnr)) break allowedBreak;
                                     programme.setChannelPnrId(channelPnr);
+                                    Channel channel1 = Channel.getByPndId(channelPnr);
+                                    if (channel1 != null) programme.setChannelId(channel1.getId());
                                 } else if (attributeName.equals(EpgResult.START)) {
                                     String startStr = attribute.getValue();
                                     long start = parseEpgXmlDate(startStr);
@@ -311,7 +307,8 @@ public class EpgCollector {
             return programmes;
         }
 
-        private void persist(List<Programme> programmes) {
+        private int persist(List<Programme> programmes) {
+            int savedCount = 0;
             Map<Integer, Long> latestDates = new HashMap<>();
             for (Programme programme : programmes) {
                 long latestStartDate = 0L;
@@ -319,10 +316,9 @@ public class EpgCollector {
                 if (latestDates.containsKey(channelPnrId)) {
                     latestStartDate = latestDates.get(channelPnrId);
                 } else {
-                    latestStartDate = getLatestStartDate(programme);
+                    latestStartDate = getLatestStartDate(channelPnrId);
                     latestDates.put(channelPnrId, latestStartDate);
                 }
-                //System.out.println("programme.getStart ["+programme.getStart()+"] || latestStartDate ["+latestStartDate+"]");
                 if (programme.getStart() > latestStartDate) {
                     Channel channel = Channel.getByPndId(channelPnrId);
                     if (channel == null) continue;
@@ -380,17 +376,21 @@ public class EpgCollector {
                         if (subtitlesLang == null) statement.setNull(++counter, Types.NULL);
                         else statement.setString(++counter, subtitlesLang);
                         statement.executeUpdate();
+                        savedCount++;
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
                 }
             }
+            return savedCount;
         }
 
-        private long getLatestStartDate(Programme programme) {
+        private long getLatestStartDate(int channelPnrId) {
             try {
+                Channel channel = Channel.getByPndId(channelPnrId);
+                if (channel == null) return -1;
                 String query = "SELECT " + DATE_START + " FROM " + TABLE_NAME + " WHERE " +
-                        CHANNEL_ID + " = " + programme.getChannelId() + " ORDER BY " + DATE_START + " DESC LIMIT 1";
+                        CHANNEL_ID + " = " + channel.getId() + " ORDER BY " + DATE_START + " DESC LIMIT 1";
                 ResultSet resultSet = db.selectSql(query);
                 while (resultSet.next()) {
                     String result = resultSet.getString(DATE_START);

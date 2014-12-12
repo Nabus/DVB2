@@ -1,4 +1,5 @@
 package com.nabusdev.padmedvbts2.model;
+import com.nabusdev.padmedvbts2.service.ForwardWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.util.Map;
 public class Client {
     private int clientID;
     private Socket channel;
-    private int writeErrorCount;
+    private ForwardWriter writer;
     private DataInputStream dataInputStream;
     private DataOutputStream dataOutputStream;
     private static volatile int clientLastID = 0;
@@ -19,7 +20,7 @@ public class Client {
         this.channel = channel;
         this.dataInputStream = createDataInputStream();
         this.dataOutputStream = createDataOutputStream();
-        clientID = ++clientLastID;
+        this.clientID = ++clientLastID;
         this.addToList();
     }
 
@@ -55,15 +56,11 @@ public class Client {
         return channel;
     }
 
-    public void increaseWriteErrorCount() {
-        writeErrorCount++;
+    public ForwardWriter getWriter() {
+        return writer;
     }
 
-    public void resetWriteErrorCount() {
-        writeErrorCount = 0;
-    }
-
-    public int getWriteErrorCount() {
-        return writeErrorCount;
+    public void setWriter(ForwardWriter writer) {
+        this.writer = writer;
     }
 }
