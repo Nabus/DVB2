@@ -1,4 +1,7 @@
 package com.nabusdev.padmedvbts2.model;
+import static com.nabusdev.padmedvbts2.util.Constants.Table.StreamForward.*;
+import com.nabusdev.padmedvbts2.util.Database;
+import com.nabusdev.padmedvbts2.util.DatabaseProvider;
 
 public class Forward {
     private int id;
@@ -12,6 +15,7 @@ public class Forward {
     private String outputStreamUrlPath;
     private int outputStreamTimeout = 30000;
     private int outputStreamClientLimit = 1;
+    private static Database db = DatabaseProvider.getChannelsDB();
 
     public Forward(int id, Channel channel, String outputStreamProtocol, String outputStreamHost, int outputStreamPort) {
         this.id = id;
@@ -103,5 +107,10 @@ public class Forward {
 
     public void setOutputStreamClientLimit(int outputStreamClientLimit) {
         this.outputStreamClientLimit = outputStreamClientLimit;
+    }
+
+    public void increaseClientConnectionAttempts() {
+        db.execSql(String.format("UPDATE %s SET %s = %s + 1 WHERE id = %d",
+                TABLE_NAME, CONNECTION_ATTEMPTS, CONNECTION_ATTEMPTS, getId()));
     }
 }

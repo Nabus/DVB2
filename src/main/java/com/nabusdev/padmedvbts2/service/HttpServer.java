@@ -48,19 +48,33 @@ public class HttpServer implements Runnable, ForwardProcess {
         try {
             while (!network.isClosed()) {
                 Socket socket = network.accept();
-                Client client = new Client(socket);
+                Client client = new Client(socket, forward);
                 boolean isReadyToAccept = (forward.getChannel().getStream() != null);
 
                 if (isReadyToAccept) {
-                    new Thread(new AcceptClient(client, forward)).start();
+                    if (!isClientLimitReached()) {
+                        new Thread(new AcceptClient(client, forward)).start();
+                    } else {
+                        logger.info("Client "+ client.getIp() +" dropped. Clients limit exceeded");
+                        client.drop();
+                    }
                 } else {
-                    logger.debug("Client dropped. Not ready to accept.");
-                    client.getChannel().close();
+                    logger.debug("Client "+ client.getIp() +" dropped. Not ready to accept.");
+                    client.drop();
                 }
+
+                forward.increaseClientConnectionAttempts();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isClientLimitReached() {
+        int counter = 0;
+        for (Client client : Client.getClientsByForward(forward)) counter++;
+        if (counter >= forward.getOutputStreamClientLimit()) return true;
+        return false;
     }
 
     class AcceptClient implements Runnable {
@@ -73,8 +87,8 @@ public class HttpServer implements Runnable, ForwardProcess {
         }
 
         public void run() {
-            final String clientIp = client.getChannel().getInetAddress().toString().replace("/", "");
-            logger.info("Client " + clientIp + " connected to forward ID: " + forward.getId() + " channel ID: " + forward.getChannel().getId());
+            logger.info("Client " + client.getIp() + " connected to forward ID: " +
+                    forward.getId() + " channel ID: " + forward.getChannel().getId());
             writeResponse(client);
             Stream stream = forward.getChannel().getStream();
             stream.addClient(client);

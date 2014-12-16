@@ -12,11 +12,9 @@ public class AdapterLoader {
     private static Database db = DatabaseProvider.getChannelsDB();
 
     public static void load() {
-        final String IDENTIFICATION = Variable.get(Constants.Config.IDENTIFICATION);
-        String query = String.format("SELECT " + ID + "," + IDENT + "," + PATH + "," + ADAPTER_TYPE + "," +
-                FREQUENCY + "," + BANDWIDTH + "," + TRANSMISSION_MODE + "," + GUARD_INTERVAL + "," + HIERARCHY + "," +
-                MODULATION + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1 AND " + IDENT + " = '" + IDENTIFICATION + "';");
-
+        String query = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s = %d AND %s = 1",
+                ID, ADAPTER_TYPE, PATH, FREQUENCY, BANDWIDTH, TRANSMISSION_MODE, GUARD_INTERVAL, HIERARCHY, MODULATION,
+                TABLE_NAME, SERVER_ID, DatabaseLoader.getServerId(), ACTIVE);
         ResultSet resultSet = db.selectSql(query);
         process(resultSet);
     }
@@ -25,21 +23,22 @@ public class AdapterLoader {
         try {
             while (resultSet.next()) {
                 int id = resultSet.getInt(ID);
-                String ident = resultSet.getString(IDENT);
-                String path = resultSet.getString(PATH);
                 String adapterType = resultSet.getString(ADAPTER_TYPE);
+                String path = resultSet.getString(PATH);
                 int frequency = resultSet.getInt(FREQUENCY);
                 int bandwidth = resultSet.getInt(BANDWIDTH);
                 String transmissionMode = resultSet.getString(TRANSMISSION_MODE);
                 String guardInterval = resultSet.getString(GUARD_INTERVAL);
                 String hierarchy = resultSet.getString(HIERARCHY);
-                Adapter adapter = new Adapter(id, ident, path);
+                String modulation = resultSet.getString(MODULATION);
+                Adapter adapter = new Adapter(id, path);
                 adapter.setAdapterType(adapterType);
                 adapter.setFrequency(frequency);
                 adapter.setBandwidth(bandwidth);
                 adapter.setTransmissionMode(transmissionMode);
                 adapter.setGuardInterval(guardInterval);
                 adapter.setHierarchy(hierarchy);
+                adapter.setModulation(modulation);
             }
         } catch (SQLException e) {
             e.printStackTrace();

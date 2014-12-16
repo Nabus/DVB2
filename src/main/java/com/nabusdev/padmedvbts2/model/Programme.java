@@ -1,42 +1,65 @@
 package com.nabusdev.padmedvbts2.model;
 
+import java.util.List;
+import java.util.Map;
+
 public class Programme {
-    private int channelId;
-    private int channelPnrId;
+    private int id;
+    private Channel channel;
+    private int channelPnr;
     private long start;
     private long stop;
-    private String title;
-    private String titleLang;
-    private String subTitle;
-    private String subTitleLang;
-    private String desc;
-    private String descLang;
-    private String language;
-    private String videoAspect;
+    private List<Map.Entry<String, String>> titles;
+    private List<Map.Entry<String, String>> subtitles;
+    private List<Map.Entry<String, String>> descriptions;
+    private List<Map.Entry<String, String>> credits;
+    private List<Map.Entry<String, String>> categories;
     private String audioStereo;
-    private String ratingSystem;
-    private String ratingValue;
+    private String videoAspect;
+    private String videoQuality;
     private String subtitlesType;
     private String subtitlesLanguage;
+    private String ratingSystem;
+    private String ratingValue;
+    private String language;
+    private String origLanguage;
+    private int length;
+    private String icon;
+    private String url;
+    private String country;
+    private int episodeNum;
+    private String starRating;
+    private long previouslyShown;
+    private boolean isPremiere;
+    private boolean isLastChance;
+    private boolean isNew;
 
     public Programme() {
 
     }
 
-    public int getChannelId() {
-        return channelId;
+    public int getId() {
+        return id;
     }
 
-    public void setChannelId(int channelId) {
-        this.channelId = channelId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public int getChannelPnrId() {
-        return channelPnrId;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setChannelPnrId(int channelPnrId) {
-        this.channelPnrId = channelPnrId;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public int getChannelPnr() {
+        return channelPnr;
+    }
+
+    public void setChannelPnr(int channelPnr) {
+        this.channelPnr = channelPnr;
     }
 
     public long getStart() {
@@ -55,60 +78,52 @@ public class Programme {
         this.stop = stop;
     }
 
-    public String getTitle() {
-        return title;
+    public List<Map.Entry<String, String>> getTitles() {
+        return titles;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitles(List<Map.Entry<String, String>> titles) {
+        this.titles = titles;
     }
 
-    public String getTitleLang() {
-        return titleLang;
+    public List<Map.Entry<String, String>> getSubtitles() {
+        return subtitles;
     }
 
-    public void setTitleLang(String titleLang) {
-        this.titleLang = titleLang;
+    public void setSubtitles(List<Map.Entry<String, String>> subtitles) {
+        this.subtitles = subtitles;
     }
 
-    public String getSubTitle() {
-        return subTitle;
+    public List<Map.Entry<String, String>> getDescriptions() {
+        return descriptions;
     }
 
-    public void setSubTitle(String subTitle) {
-        this.subTitle = subTitle;
+    public void setDescriptions(List<Map.Entry<String, String>> descriptions) {
+        this.descriptions = descriptions;
     }
 
-    public String getSubTitleLang() {
-        return subTitleLang;
+    public List<Map.Entry<String, String>> getCredits() {
+        return credits;
     }
 
-    public void setSubTitleLang(String subTitleLang) {
-        this.subTitleLang = subTitleLang;
+    public void setCredits(List<Map.Entry<String, String>> credits) {
+        this.credits = credits;
     }
 
-    public String getDesc() {
-        return desc;
+    public List<Map.Entry<String, String>> getCategories() {
+        return categories;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setCategories(List<Map.Entry<String, String>> categories) {
+        this.categories = categories;
     }
 
-    public String getDescLang() {
-        return descLang;
+    public String getAudioStereo() {
+        return audioStereo;
     }
 
-    public void setDescLang(String descLang) {
-        this.descLang = descLang;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setAudioStereo(String audioStereo) {
+        this.audioStereo = audioStereo;
     }
 
     public String getVideoAspect() {
@@ -119,12 +134,28 @@ public class Programme {
         this.videoAspect = videoAspect;
     }
 
-    public String getAudioStereo() {
-        return audioStereo;
+    public String getVideoQuality() {
+        return videoQuality;
     }
 
-    public void setAudioStereo(String audioStereo) {
-        this.audioStereo = audioStereo;
+    public void setVideoQuality(String videoQuality) {
+        this.videoQuality = videoQuality;
+    }
+
+    public String getSubtitlesType() {
+        return subtitlesType;
+    }
+
+    public void setSubtitlesType(String subtitlesType) {
+        this.subtitlesType = subtitlesType;
+    }
+
+    public String getSubtitlesLanguage() {
+        return subtitlesLanguage;
+    }
+
+    public void setSubtitlesLanguage(String subtitlesLanguage) {
+        this.subtitlesLanguage = subtitlesLanguage;
     }
 
     public String getRatingSystem() {
@@ -143,19 +174,99 @@ public class Programme {
         this.ratingValue = ratingValue;
     }
 
-    public String getSubtitlesType() {
-        return subtitlesType;
+    public String getLanguage() {
+        return language;
     }
 
-    public void setSubtitlesType(String subtitlesType) {
-        this.subtitlesType = subtitlesType;
+    public void setLanguage(String language) {
+        this.language = language;
     }
 
-    public String getSubtitlesLanguage() {
-        return subtitlesLanguage;
+    public String getOrigLanguage() {
+        return origLanguage;
     }
 
-    public void setSubtitlesLanguage(String subtitlesLanguage) {
-        this.subtitlesLanguage = subtitlesLanguage;
+    public void setOrigLanguage(String origLanguage) {
+        this.origLanguage = origLanguage;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public int getEpisodeNum() {
+        return episodeNum;
+    }
+
+    public void setEpisodeNum(int episodeNum) {
+        this.episodeNum = episodeNum;
+    }
+
+    public String getStarRating() {
+        return starRating;
+    }
+
+    public void setStarRating(String starRating) {
+        this.starRating = starRating;
+    }
+
+    public long getPreviouslyShown() {
+        return previouslyShown;
+    }
+
+    public void setPreviouslyShown(long previouslyShown) {
+        this.previouslyShown = previouslyShown;
+    }
+
+    public boolean isPremiere() {
+        return isPremiere;
+    }
+
+    public void setPremiere(boolean isPremiere) {
+        this.isPremiere = isPremiere;
+    }
+
+    public boolean isLastChance() {
+        return isLastChance;
+    }
+
+    public void setLastChance(boolean isLastChance) {
+        this.isLastChance = isLastChance;
+    }
+
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void setNew(boolean isNew) {
+        this.isNew = isNew;
     }
 }

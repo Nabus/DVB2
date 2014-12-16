@@ -51,34 +51,21 @@ public class ThumbnailService {
         String format = getValidFormat(channel.getThumbSaveFormat());
         int fileSize = saveThumbnail(channel, pathToSave, fileName, format);
         if (fileSize > 0) {
-            String query = "INSERT INTO " + TABLE_NAME + " (" + CHANNEL_ID + "," + PATH + "," + FILENAME + "," +
-                    SIZE + "," + FORMAT + "," + ACTIVE + "," + DATE_CREATED + ") VALUES (" + channel.getId() + ",'" +
-                    pathToSave + "','" + fileName + "'," + fileSize + ",'" + format + "', 1, now());";
+            String query = String.format("INSERT INTO %s (%s, %s, %s, %s, %s, %s, %s) VALUES (%d, '%s', '%s', %d, '%s', 1, now())",
+                    TABLE_NAME, CHANNEL_ID, PATH, FILENAME, SIZE, FORMAT, ACTIVE, DATE_CREATED,
+                    channel.getId(), pathToSave, fileName, fileSize, format);
             db.execSql(query);
         }
     }
 
     private int saveThumbnail(Channel channel, String pathToSave, String fileName, String format) {
-        File thumbSource = new File(JAVA_EXEC_PATH + File.separator + "thumbSource.video");
-        if (thumbSource.exists()) thumbSource.delete();
-        Stream stream = channel.getStream();
-        if (stream == null) return 0;
+        final int MILLIS_FACTOR = 1000;
+        final int RECORD_SEC_COUNT = 5;
+        final String THUMBNAIL_FILE_PATH = JAVA_EXEC_PATH + File.separator + "thumbSource.video";
+        File thumbSource = StreamRecorder.record(THUMBNAIL_FILE_PATH, channel, RECORD_SEC_COUNT * MILLIS_FACTOR);
+        if (thumbSource == null) return 0;
         try {
-            FileOutputStream fileStream = new FileOutputStream(thumbSource);
-            URL url = new URL("http://" + stream.getIp() + ":" + stream.getPort() + stream.getPath());
-            URLConnection connection = url.openConnection();
-            long startRecord = System.currentTimeMillis();
-            int MILLIS_FACTOR = 1000;
-            while (System.currentTimeMillis() - startRecord <= MILLIS_FACTOR) {
-                byte[] arr = new byte[4096];
-                int readByte = connection.getInputStream().read(arr);
-                if (readByte != -1) {
-                    fileStream.write(arr, 0, readByte);
-                }
-            }
-            fileStream.flush();
-            fileStream.close();
-            int FRAME_NUMBER = 1;
+            int FRAME_NUMBER = 10;
             BufferedImage frame = FrameGrab.getFrame(thumbSource, FRAME_NUMBER);
             File thumbFile = new File(pathToSave + File.separator + fileName + "." + format);
             ImageIO.write(frame, format, thumbFile);
@@ -86,7 +73,7 @@ public class ThumbnailService {
             return (int) thumbFile.length();
 
         } catch (Exception e) {
-            //e.printStackTrace();
+            // TODO e.printStackTrace();
             return 0;
 
         } finally {

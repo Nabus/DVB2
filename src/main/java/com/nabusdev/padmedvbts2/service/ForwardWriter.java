@@ -6,15 +6,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ForwardWriter implements Runnable {
-    private volatile boolean isWriting = false;
-    private volatile boolean gotNewPackets = false;
+    private boolean isWriting = false;
+    private boolean gotNewPackets = false;
     private byte[] bufferArray;
     private int readByte;
     private Client client;
     private ForwardReader reader;
-    private int writeErrorCount;
+    private long lastActivity;
     private boolean continueWriting;
-    final int MAX_ERROR_COUNT = 20000;
     private static Logger logger = LoggerFactory.getLogger(ForwardWriter.class);
 
     ForwardWriter(Client client, ForwardReader reader) {
@@ -29,18 +28,20 @@ public class ForwardWriter implements Runnable {
             if (gotNewPackets) {
                 try {
                     writeData();
+                    resetLastActivity();
                     gotNewPackets = false;
-                    resetWriteErrorCount();
                 } catch (Exception e) {
-                    increaseWriteErrorCount();
-                    if (getWriteErrorCount() >= MAX_ERROR_COUNT) {
-                        final String clientIp = client.getChannel().getInetAddress().toString().replace("/", "");
-                        logger.info("Client " + clientIp + " dropped due to write errors.");
+                    if (System.currentTimeMillis() - getLastActivity() >= getOutputStreamTimeout()) {
+                        logger.info("Client " + client.getIp() + " dropped. Inactivity timeout exceeded.");
                         eliminateClient();
                     }
                 }
             }
         }
+    }
+
+    private int getOutputStreamTimeout() {
+        return client.getForward().getOutputStreamTimeout();
     }
 
     public void updateBuffer(byte[] bufferArray, int readByte) {
@@ -67,15 +68,11 @@ public class ForwardWriter implements Runnable {
         catch (Exception e) { /* Ignoring Exception */ }
     }
 
-    private int getWriteErrorCount() {
-        return writeErrorCount;
+    private long getLastActivity() {
+        return lastActivity;
     }
 
-    private void increaseWriteErrorCount() {
-        writeErrorCount++;
-    }
-
-    private void resetWriteErrorCount() {
-        writeErrorCount = 0;
+    private void resetLastActivity() {
+        lastActivity = System.currentTimeMillis();
     }
 }

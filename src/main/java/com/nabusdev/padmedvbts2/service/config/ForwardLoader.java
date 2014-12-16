@@ -15,11 +15,10 @@ public class ForwardLoader {
     private static Logger logger = LoggerFactory.getLogger(ForwardLoader.class);
 
     public static void load() {
-        String query = String.format("SELECT " + ID + "," + CHANNEL_ID + "," + EVENT_TYPE + "," +
-                OUTPUT_STREAM_PROTOCOL + "," + OUTPUT_STREAM_HOST + "," + OUTPUT_STREAM_PORT + "," +
-                OUTPUT_STREAM_USERNAME + "," + OUTPUT_STREAM_PASSWORD + "," + OUTPUT_STREAM_URL_PATH + "," +
-                OUTPUT_STREAM_TIMEOUT + "," + OUTPUT_STREAM_CLIENT_LIMIT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
-
+        String query = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s = 1",
+                ID, ADAPTER_CHANNEL_ID, EVENT_TYPE, OUTPUT_STREAM_PROTOCOL, OUTPUT_STREAM_HOST, OUTPUT_STREAM_PORT,
+                OUTPUT_STREAM_USERNAME, OUTPUT_STREAM_PASSWORD, OUTPUT_STREAM_URL_PATH, OUTPUT_STREAM_TIMEOUT,
+                OUTPUT_STREAM_CLIENT_LIMIT, TABLE_NAME, ACTIVE);
         ResultSet resultSet = db.selectSql(query);
         linkForwardsToChannels(resultSet);
     }
@@ -28,7 +27,7 @@ public class ForwardLoader {
         try {
             while (resultSet.next()) {
                 int id = resultSet.getInt(ID);
-                int channelId = resultSet.getInt(CHANNEL_ID);
+                int channelId = resultSet.getInt(ADAPTER_CHANNEL_ID);
                 ForwardStatus eventType = getForwardStatus(channelId, resultSet.getString(EVENT_TYPE));
                 String outputStreamProtocol = resultSet.getString(OUTPUT_STREAM_PROTOCOL);
                 String outputStreamHost = resultSet.getString(OUTPUT_STREAM_HOST);

@@ -11,23 +11,22 @@ public class Adapter {
     private int id;
     private String path;
     private int pathId;
-    private String ident;
     private String adapterType;
     private int frequency;
     private int bandwidth;
     private String transmissionMode;
     private String guardInterval;
     private String hierarchy;
+    private String modulation;
     private String serviceIp;
     private int servicePort;
     private List<Channel> channels = new ArrayList<>();
     private static Map<Integer, Adapter> adapters = new HashMap<>();
     private static Database db = DatabaseProvider.getChannelsDB();
 
-    public Adapter(int id, String ident, String path) {
+    public Adapter(int id, String path) {
        this.id = id;
        this.path = path;
-       this.ident = ident;
        this.pathId = Integer.parseInt(path.replaceAll("\\D+",""));
        adapters.put(id, this);
     }
@@ -122,5 +121,13 @@ public class Adapter {
 
     public void setServiceIp(String serviceIp) {
         this.serviceIp = serviceIp;
+    }
+
+    public String getModulation() {
+        return modulation;
+    }
+
+    public void setModulation(String modulation) {
+        this.modulation = modulation;
     }
 }

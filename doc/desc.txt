@@ -1,0 +1,94 @@
+Program name = PadmeDVBTS2
+
+PadmeDVBTS2 has to be run as a very stable service via /etc/init.d and influenced by common commands like START / STOP / RESTART
+PadmeDVBTS2 has to be stable and accessible and repairable without closing whole program
+- accessible by COMMAND MANAGER communication protocol - telnet - https://mina.apache.org/mina-project/userguide/ch2-basics/sample-tcp-server.html
+- if thread will be dead or will there be any problem, it should be killed and restart again by command CHANNEL RENEW {id}
+Triggers to JMS - Each time there will be some situation, or recovery, there should be connection to JMS to subsequent processing information
+    - Sends message
+Logging via LogBack.
+Target OS is Linux Debian Jessie and Java 7
+Buildable using Maven 3
+
+MAIN FUNCTIONS
+	- PadmeDVBTS2 has to:
+		- read streams from specified adapter (automatically without command manager intervention)
+		- read EPG from specified adapter and save it to DB (automatically without command manager intervention)
+		- read TXT (teletext) from specified adapter and save it to DB (automatically without command manager intervention)
+		- make thumbnails of each stream (JPEG / PNG)
+		- analyze stream for errors and make statistics
+		- forwarding streams by few protocols out (http/https/multicast)
+		- Support for DVB T/T2 S/S2
+
+SETTINGS
+	for server in DB, identified by ident value:
+
+	Server.properties (path to file given as a parameter to program)
+	ident=08a32dc5-affd-dff5-0000-0000719a2e94
+	dbUrl=jdbc:postgresql://127.0.0.1/dvbts2?user=postgres&password=
+
+	Values in DB belongs for that server (table dvbts2.server_setup):
+	08a32dc5-affd-dff5-0000-0000719a2e94    commandManagerInterface		eth0
+	08a32dc5-affd-dff5-0000-0000719a2e94    commandManagerHost			127.0.0.1
+	08a32dc5-affd-dff5-0000-0000719a2e94    commandManagerPort			2222
+	08a32dc5-affd-dff5-0000-0000719a2e94    commandManagerAllowFrom		127.0.0.1,192.168.1.1
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerHost				127.0.0.1
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerPort				5432
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerUsername			test
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerPassword			test
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerDatabase			dvbts2
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerPeriod				60000						# period to look in table dvbts2.channels for any changes in configuration or new channels to process
+	08a32dc5-affd-dff5-0000-0000719a2e94    dbManagerTimeout			60000						# timeout for connecting to DB
+	(if some value in code can be configurable, place it to DB (for example like some timeouts, formats, etc.))
+
+	Server.properties holds only ident (to match with specified setup) and jdbc connecton url to read configuration from.
+
+CHANNEL configuration (row in DB) consists of:
+	- ident to decide to what PadmeDVBTS2 instance this channel belongs
+	- input stream configuration
+	- output stream configuration where some listeners (one or many) can read real time stream forwarded from input stream continuously to output stream
+	- thumbnails configuration - how often, where and in which format save thumbnails to
+	- statistic information like when recording started, when error occur, how many times PadmeDVBTS2 tried to connect source stream, etc
+
+COMMAND MANAGER
+	- Manage CHANNELS threads by configuration from DB MANAGER who reads conf from DB.
+	- Each CHANNEL is basically configured channel from table dvbts2.channels identified by same ident with configuration.
+
+	- For example, if there are 3 channels in table dvbts2.channels like:
+
+		id=101		pid=513		ident=08a32dc5-affd-dff5-0000-0000719a2e94 		...
+		id=102		pid=514		ident=08a32dc5-affd-dff5-0000-0000719a2e94 		...
+		id=103		pid=515		ident=08a32dc5-affd-dff5-0000-0000719a2e94 		...
+
+		PadmeDVBTS2 on server with Server.properties with ident=08a32dc5-affd-dff5-0000-0000719a2e94 reads DB and finds those 3 records above with ids (101, 102 and 103)
+		and create 3 CHANNELS threads to processing channels like 101, 102 and 103
+
+	- Each CHANNEL sends signals to DB to set status of channel:
+		- when it starts reading
+		- when it fails reading
+		- when it start reading again (time of next attempt)
+
+COMMAND MANAGER communication protocol
+	- accessible by configuration  commandManagerInterface, commandManagerHost, commandManagerPort, commandManagerAllowFrom
+	- simple text telnet commands
+	- commands like {id} = channel id in DB:
+		CHANNEL INPUT START {id}	# starts channel processing from source - basically it won't be used because it has to become automatically by reading table dvbts2.channels from DB
+		CHANNEL INPUT STOP {id}		# stops channel processing - it won't be used either, but it has to be prepared to work if it will be needed
+		CHANNEL INPUT RESTART {id}	# do CHANNEL INPUT STOP {id} and CHANNEL INPUT START {id} right after first one
+
+		CHANNEL OUTPUT START {id}		# starts stream source streaming out by output configuration - basically it won't be used because it has to become automatically by reading table dvbts2.channels from DB
+		CHANNEL OUTPUT STOP {id}		# stops stream source streaming out
+		CHANNEL OUTPUT RESTART {id}		# do CHANNEL OUTPUT STOP {id} and CHANNEL OUTPUT START {id} right after first one
+
+		CHANNEL RENEW {id}			# if thread fails, this is the way how to repair it
+		CHANNEL STATUS {id}			# returns statistic information about specified CHANNEL thread (is it running, how long is running, how many fails occured, etc.)
+		CHANNEL ALLSTATUS			# returns statistic information about all CHANNEL threads
+
+		CONFIG RENEW			# force read configuration from DB
+		CONFIG STATUS           # returns timestamp when was configuration read
+
+		DBCONN RENEW			# force repair connection to DB
+		DBCONN STATUS			# returns db connection status
+
+THUMBS
+	- Each time when number of miliseconds pass by thumbnails configuration, there will be created new thumb in JPEG into path to save thumbnail by configuration.

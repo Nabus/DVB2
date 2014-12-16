@@ -45,6 +45,10 @@ public class Database {
         return null;
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     public PreparedStatement getPrepareStatement(String query) {
         try { return connection.prepareStatement(query); }
         catch (SQLException e) { e.printStackTrace(); }

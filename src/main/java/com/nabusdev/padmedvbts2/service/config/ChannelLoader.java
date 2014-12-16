@@ -14,10 +14,9 @@ public class ChannelLoader {
     private static Logger logger = LoggerFactory.getLogger(ChannelLoader.class);
 
     public static void load() {
-        String query = String.format("SELECT " + ID + "," + ADAPTER_ID + "," + NAME + "," + IDENT + "," + PNR + "," +
-                THUMB_SAVE_PATH + "," + THUMB_SAVE_FILENAME_PATTERN + "," + THUMB_SAVE_PERIOD + "," +
-                THUMB_SAVE_FORMAT + " FROM " + TABLE_NAME + " WHERE " + ACTIVE + " = 1;");
-
+        String query = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s, %s FROM %s WHERE %s = 1",
+                ID, ADAPTER_ID, NAME, IDENT, PNR, THUMB_SAVE_PATH, THUMB_SAVE_FILENAME_PATTERN,
+                THUMB_SAVE_PERIOD, THUMB_SAVE_FORMAT, TABLE_NAME, ACTIVE);
         ResultSet resultSet = db.selectSql(query);
         linkChannelsToAdapters(resultSet);
     }

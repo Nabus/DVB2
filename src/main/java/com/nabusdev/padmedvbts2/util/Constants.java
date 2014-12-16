@@ -1,5 +1,4 @@
 package com.nabusdev.padmedvbts2.util;
-import static com.nabusdev.padmedvbts2.util.Variable.get;
 import com.nabusdev.padmedvbts2.Main;
 import java.io.File;
 import java.net.URISyntaxException;
@@ -7,11 +6,11 @@ import java.security.CodeSource;
 
 public class Constants {
     public static final String JAVA_EXEC_PATH = getJavaExecutablePath();
-    public static final String MUMUDVB_PATH = getJavaExecutablePath() + File.separator + "tools" + File.separator + "mumudvb" + File.separator + "mumudvb";
-    public static final String TVGRAB_PATH = getJavaExecutablePath() + File.separator + "tools" + File.separator + "tv_grab_dvb_plus" + File.separator + "tv_grab_dvb_plus";
+    public static final String MUMUDVB_PATH = JAVA_EXEC_PATH + File.separator + "tools" + File.separator + "mumudvb" + File.separator + "mumudvb";
+    public static final String TVGRAB_PATH = JAVA_EXEC_PATH + File.separator + "tools" + File.separator + "tv_grab_dvb_plus" + File.separator + "tv_grab_dvb_plus";
 
     public class Config {
-        // When called from outside must be enclosed in Variable.get(<name>)
+        // When called from outside must be enclosed in Variable.get("<name>")
         public static final String IDENTIFICATION = "ident";
         public static final String DB_USER = "dbUser";
         public static final String DB_PASSWORD = "dbPassword";
@@ -38,6 +37,7 @@ public class Constants {
         public static final String EPG_TIMESTAMP_OFFSET = "epgTimestampOffset";
         public static final String INPUT_SERVICE_IP = "inputServiceIp";
         public static final String INPUT_SERVICE_START_PORT = "inputServiceStartPort";
+        public static final String THROUGHPUT_UPDATE_INTERVAL = "throughputUpdateInterval";
     }
 
     public class Telnet {
@@ -62,17 +62,19 @@ public class Constants {
 
     public class Table {
 
-        public class ServerSetup {
-            public static final String TABLE_NAME = "dvbts2.server_setup";
+        public class Servers {
+            public static final String TABLE_NAME = "adm.servers";
             public static final String ID = "id";
-            public static final String SERVER_ID = "server_id";
             public static final String IDENT = "ident";
+            public static final String ACTIVE = "1";
+        }
+
+        public class ServerSetup {
+            public static final String TABLE_NAME = "adm.server_setup";
+            public static final String SERVER_ID = "server_id";
             public static final String SETUP_KEY = "setup_key";
             public static final String SETUP_VALUE = "setup_value";
-            public static final String DATE_CHANGED = "date_changed";
-            public static final String USER_CHANGED = "user_changed";
-            public static final String NOTE = "note";
-            public static final String CREATED = "created";
+            public static final String ACTIVE = "active";
         }
 
         public class Channels {
@@ -96,7 +98,7 @@ public class Constants {
         public class Adapters {
             public static final String TABLE_NAME = "dvbts2.adapters";
             public static final String ID = "id";
-            public static final String IDENT = "ident";
+            public static final String SERVER_ID = "server_id";
             public static final String PATH = "path";
             public static final String ADAPTER_TYPE = "adapter_type";
             public static final String FREQUENCY = "frequency";
@@ -115,7 +117,7 @@ public class Constants {
         public class StreamForward {
             public static final String TABLE_NAME = "dvbts2.stream_forward";
             public static final String ID = "id";
-            public static final String CHANNEL_ID = "channel_id";
+            public static final String ADAPTER_CHANNEL_ID = "adapter_channel_id";
             public static final String EVENT_TYPE = "event_type";
             public static final String OUTPUT_STREAM_PROTOCOL = "output_stream_protocol";
             public static final String OUTPUT_STREAM_HOST = "output_stream_host";
@@ -151,20 +153,65 @@ public class Constants {
             public static final String DATE_START = "date_start";
             public static final String DATE_STOP = "date_stop";
             public static final String DATE_MAKE = "date_make";
-            public static final String TITLE = "title";
-            public static final String TITLE_LANG = "title_lang";
-            public static final String SUBTITLE = "subtitle";
-            public static final String SUBTITLE_LANG = "subtitle_lang";
-            public static final String DESCRIPTION = "description";
-            public static final String DESCRIPTION_LANG = "description_lang";
-            public static final String LANG = "lang";
-            public static final String VIDEO_ASPECT = "video_aspect";
             public static final String AUDIO = "audio";
-            public static final String RATING_SYSTEM = "rating_system";
-            public static final String RATING_VALUE = "rating_value";
+            public static final String VIDEO_ASPECT = "video_aspect";
+            public static final String VIDEO_QUALITY = "video_quality";
             public static final String SUBTITLES_TYPE = "subtitles_type";
             public static final String SUBTITLES_LANG = "subtitles_lang";
-            public static final String ACTIVE = "active";
+            public static final String RATING_SYSTEM = "rating_system";
+            public static final String RATING_VALUE = "rating_value";
+            public static final String ORIG_LANG = "orig_lang";
+            public static final String LENGTH = "length";
+            public static final String ICON = "icon";
+            public static final String URL = "url";
+            public static final String COUNTRY = "country";
+            public static final String EPISODE_NUM = "episode_num";
+            public static final String STAR_RATING = "star_rating";
+            public static final String PREVIOUSLY_SHOWN = "previously_shown";
+            public static final String PREMIERE = "premiere";
+            public static final String LAST_CHANCE = "last_chance";
+            public static final String NEW = "new";
+        }
+
+        public class EpgProgrammeTitle {
+            public static final String TABLE_NAME = "dvbts2.epg_programme_title";
+            public static final String ID = "id";
+            public static final String EPG_PROGRAMME_ID = "epg_programme_id";
+            public static final String LANG_NAME = "lang_name";
+            public static final String VAL = "val";
+            public static final String SUB = "sub";
+        }
+
+        public class EpgProgrammeDesc {
+            public static final String TABLE_NAME = "dvbts2.epg_programme_desc";
+            public static final String ID = "id";
+            public static final String EPG_PROGRAMME_ID = "epg_programme_id";
+            public static final String LANG_NAME = "lang_name";
+            public static final String VAL = "val";
+        }
+
+        public class EpgProgrammeCategory {
+            public static final String TABLE_NAME = "dvbts2.epg_programme_category";
+            public static final String ID = "id";
+            public static final String EPG_PROGRAMME_ID = "epg_programme_id";
+            public static final String LANG_NAME = "lang_name";
+            public static final String VAL = "val";
+        }
+
+        public class EpgProgrammeCredit {
+            public static final String TABLE_NAME = "dvbts2.epg_programme_credit";
+            public static final String ID = "id";
+            public static final String EPG_PROGRAMME_ID = "epg_programme_id";
+            public static final String CREDIT_TYPE = "credit_type";
+            public static final String VAL = "val";
+        }
+
+        public class StreamThroughput {
+            public static final String TABLE_NAME = "dvbts2.stream_throughput";
+            public static final String ID = "id";
+            public static final String ADAPTER_CHANNEL_ID = "adapter_channel_id";
+            public static final String VAL = "val";
+            public static final String DATE_CREATED = "date_created";
         }
     }
 
@@ -193,6 +240,9 @@ public class Constants {
             public static final String SUBTITLES = "subtitles";
             public static final String SUBTITLES_TYPE = "type";
             public static final String SUBTITLES_LANGUAGE = "language";
+
+            public static final String ORIG_LANGUAGE = "";
+
         }
     }
 

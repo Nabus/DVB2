@@ -33,10 +33,14 @@ public class ForwardReader implements Runnable {
     }
 
     private void startReading(InputStream in) {
+        final int IDEAL_INTERVAL = 500;
+        long lastLoop = 0;
+
         while (true) {
-            try {
+            if (System.currentTimeMillis() - lastLoop >= IDEAL_INTERVAL) try {
                 byte[] bufferArray = new byte[4096];
                 int readByte = in.read(bufferArray);
+                lastLoop = System.currentTimeMillis();
                 List<Client> clientList = copyList(stream.getClients());
                 for (Client client : clientList) {
                     boolean isWriterCreated = (client.getWriter() != null);

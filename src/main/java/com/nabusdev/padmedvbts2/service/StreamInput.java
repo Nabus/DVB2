@@ -46,9 +46,7 @@ public class StreamInput {
         catch (Exception e) { e.printStackTrace(); }
         if (writer == null) return;
         writer.println("card=" + adapter.getPathId());
-        final int GHZ_TO_MHZ = 1000;
-        int frequency = adapter.getFrequency() / GHZ_TO_MHZ;
-        writer.println("freq=" + frequency);
+        writer.println("freq=" + adapter.getFrequency());
         writer.println("bandwidth=" + adapter.getBandwidth() + "MHz");
         writer.println("delivery_system=" + adapter.getAdapterType());
         writer.println("autoconfiguration=full");
@@ -127,10 +125,10 @@ public class StreamInput {
 
                     if (line.startsWith("Channel number :")) {
                         String name = line.split("\"")[1];
+                        final String[] split = line.split(" ");
+                        int serviceId = Integer.parseInt(split[split.length - 1]);
                         for (Channel channel : adapter.getChannels()) {
-                            if (channel.getName().equals(name)) {
-                                final String[] split = line.split(" ");
-                                int serviceId = Integer.parseInt(split[split.length - 1]);
+                            if (channel.getPnrId() == serviceId) {
                                 Stream stream = new Stream();
                                 stream.setServiceId(serviceId);
                                 stream.setChannel(channel);
