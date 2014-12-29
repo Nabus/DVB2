@@ -84,8 +84,8 @@ Used to store information about BOX where PadmeDVBTS2 running
 CREATE TABLE adm.servers (
 	id serial,
 
-	partner_id INTEGER NOT NULL, -- reference to what partner this server belongs
 	server_type VARCHAR(255) NOT NULL, -- type of server
+	partner_id INTEGER NOT NULL, -- reference to what partner this server belongs
 
 	name VARCHAR(255) NOT NULL, -- Name of server - for admins
 	location VARCHAR(255) NOT NULL, -- Comment for admins
