@@ -85,7 +85,7 @@ CREATE TABLE adm.servers (
 	id BIGSERIAL,
 
 	server_type VARCHAR(255) NOT NULL, -- type of server
-	partner_id INTEGER NOT NULL, -- reference to what partner this server belongs
+	partner_id BIGINT NOT NULL, -- reference to what partner this server belongs
 
 	name VARCHAR(255) NOT NULL, -- Name of server - for admins
 	location VARCHAR(255) NOT NULL, -- Comment for admins
@@ -118,7 +118,7 @@ Used to store information about settings for PadmeDVBTS2 instance
 CREATE TABLE adm.server_setup (
 	id BIGSERIAL,
 
-	server_id INTEGER NOT NULL, -- reference to server table - what server this setup belongs
+	server_id BIGINT NOT NULL, -- reference to server table - what server this setup belongs
 
 	setup_key VARCHAR(255) NOT NULL,
 	setup_value VARCHAR(255) NOT NULL,
@@ -143,7 +143,7 @@ Used to store information about clusters and into what clusters which particular
 CREATE TABLE adm.clusters (
 	id BIGSERIAL,
 
-	partner_id INTEGER NOT NULL, -- reference to what partner this cluster belongs
+	partner_id BIGINT NOT NULL, -- reference to what partner this cluster belongs
 
 	name VARCHAR(255) NOT NULL, -- Name of cluster - for admins
 	description VARCHAR(255) NOT NULL, -- Comment for admins
@@ -167,7 +167,7 @@ Settings for cluster, for example JMS_TYPE (ACTIVEMQ), JMS_JNDI (connection stri
 CREATE TABLE adm.cluster_setup (
 	id BIGSERIAL,
 
-	cluster_id INTEGER NOT NULL, -- reference to clusters table
+	cluster_id BIGINT NOT NULL, -- reference to clusters table
 
 	setup_key VARCHAR(255) NOT NULL,
 	setup_value VARCHAR(255) NOT NULL,
@@ -192,8 +192,8 @@ Relations between servers a clusters
 CREATE TABLE adm.cluster_server_relation (
 	id BIGSERIAL,
 
-	cluster_id INTEGER NOT NULL, -- reference to clusters table
-	server_id INTEGER NOT NULL, -- reference to server table
+	cluster_id BIGINT NOT NULL, -- reference to clusters table
+	server_id BIGINT NOT NULL, -- reference to server table
 
 	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
 
@@ -262,7 +262,7 @@ Used to store information about DVB T/S adapters to work with
 CREATE TABLE dvbts2.adapters (
 	id BIGSERIAL,
 
-	server_id INTEGER NOT NULL, -- reference to server table - to what PadmeDVBTS2 instance this adapter belongs
+	server_id BIGINT NOT NULL, -- reference to server table - to what PadmeDVBTS2 instance this adapter belongs
 
 	adapter_type VARCHAR(255) NOT NULL, -- adapter type to use - DVB-T / DVB-S / etc.
 	path VARCHAR(255) NOT NULL, -- path to adapter device in system, e.g. /dev/dvb/adapter0
@@ -300,8 +300,8 @@ Used to store information about channels to process, information for making thum
 CREATE TABLE dvbts2.adapter_channels (
 	id BIGSERIAL,
 
-	channel_id INTEGER NOT NULL, -- identification to what channel this adapter channel belongs
-	adapter_id INTEGER NOT NULL, -- identification to what adapter this channel belongs
+	channel_id BIGINT NOT NULL, -- identification to what channel this adapter channel belongs
+	adapter_id BIGINT NOT NULL, -- identification to what adapter this channel belongs
 	pnr INTEGER NOT NULL, -- pnr id of stream
 
 	thumb_save_path VARCHAR(255), -- path to save thumbnails from source stream (/opt/thumbnails/CT1/)
@@ -336,8 +336,8 @@ Relations between adapter channels a clusters
 CREATE TABLE dvbts2.cluster_adapter_channel_relation (
 	id BIGSERIAL,
 
-	cluster_id INTEGER NOT NULL, -- reference to clusters table
-	adapter_channel_id INTEGER NOT NULL, -- reference to adapter channel table
+	cluster_id BIGINT NOT NULL, -- reference to clusters table
+	adapter_channel_id BIGINT NOT NULL, -- reference to adapter channel table
 
 	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
 
@@ -361,8 +361,8 @@ For output streaming (live)
 CREATE TABLE dvbts2.stream_forward (
 	id BIGSERIAL,
 
-	adapter_channel_id INTEGER, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
-	cluster_adapter_channel_relation_id INTEGER, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
+	adapter_channel_id BIGINT, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
+	cluster_adapter_channel_relation_id BIGINT, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
 
 	event_type VARCHAR(255) NOT NULL, -- = WAITING / PREPARING / READY / STREAMING / STOPPED / CLOSED / FAILED / PROCESSED / LIMIT_EXCEEDED
 
@@ -403,7 +403,7 @@ Used to store information about programme of some channel in EPG
 CREATE TABLE dvbts2.epg_programmes (
 	id BIGSERIAL,
 
-	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this epg program belongs
+	channel_id BIGINT NOT NULL, -- reference to dvbts2.channels to what channel this epg program belongs
 
 	date_start TIMESTAMP NOT NULL, -- when programme is scheduled to start
 	date_stop TIMESTAMP NOT NULL, -- when programme is scheduled to stop
@@ -458,7 +458,7 @@ Used to store information about programme title
 CREATE TABLE dvbts2.epg_programme_title (
 	id BIGSERIAL,
 
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this title belongs
+	epg_programme_id BIGINT NOT NULL, -- reference to dvbts2.epg_programmes to what programme this title belongs
 
 	lang_name VARCHAR(255) NOT NULL, -- language
 	val TEXT, -- value
@@ -479,7 +479,7 @@ Used to store information about programme description
 CREATE TABLE dvbts2.epg_programme_desc (
 	id BIGSERIAL,
 
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this description belongs
+	epg_programme_id BIGINT NOT NULL, -- reference to dvbts2.epg_programmes to what programme this description belongs
 
 	lang_name VARCHAR(255) NOT NULL, -- language
 	val TEXT, -- value
@@ -499,7 +499,7 @@ Used to store information about programme category
 CREATE TABLE dvbts2.epg_programme_category (
 	id BIGSERIAL,
 
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this category belongs
+	epg_programme_id BIGINT NOT NULL, -- reference to dvbts2.epg_programmes to what programme this category belongs
 
 	lang_name VARCHAR(255) NOT NULL, -- language
 	val TEXT, -- value
@@ -531,7 +531,7 @@ Used to store information about programme credits
 CREATE TABLE dvbts2.epg_programme_credit (
 	id BIGSERIAL,
 
-	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this credit belongs
+	epg_programme_id BIGINT NOT NULL, -- reference to dvbts2.epg_programmes to what programme this credit belongs
 
 	credit_type VARCHAR(255) NOT NULL, -- credit type
 	val TEXT, -- value = name
@@ -551,7 +551,7 @@ Used to store information about channel thumbnails
 CREATE TABLE dvbts2.channel_thumbs (
 	id BIGSERIAL,
 
-	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this thumbnail belongs
+	channel_id BIGINT NOT NULL, -- reference to dvbts2.channels to what channel this thumbnail belongs
 
 	path VARCHAR(255) NOT NULL, -- where is thumbnail saved
 	filename VARCHAR(255) NOT NULL, -- name of the file where is thumbnail data stored
@@ -572,7 +572,7 @@ For information about throughput of each channel
 CREATE TABLE dvbts2.stream_throughput (
 	id BIGSERIAL,
 
-	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream throughput belongs
+	adapter_channel_id BIGINT NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream throughput belongs
 
 	val INTEGER NOT NULL, -- actual throughput value in kbps
 
@@ -589,7 +589,7 @@ For information about stream statistics of each channel
 CREATE TABLE dvbts2.stream_statistics (
 	id BIGSERIAL,
 
-	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream statistics belongs
+	adapter_channel_id BIGINT NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream statistics belongs
 
 	err INTEGER NOT NULL, -- actual stream packet error value
 	packets INTEGER NOT NULL, -- actual stream packet value
@@ -609,7 +609,7 @@ For teletext data
 CREATE TABLE dvbts2.txt_data (
 	id BIGSERIAL,
 
-	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
+	adapter_channel_id BIGINT NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
 
 	-- todo teletext
 
@@ -628,11 +628,11 @@ Used to strore logging information what is happening in all instances of PadmeDV
 CREATE TABLE dvbts2.debuglog (
 	id BIGSERIAL,
 
-	server_id INTEGER, -- reference to server table - what server this setup belongs
+	server_id BIGINT, -- reference to server table - what server this setup belongs
 	ident VARCHAR(255), -- Specifies PadmeDVBTS2 instance, this log belongs
-	adapter_id INTEGER, -- Specifies adapter, this log belongs
-	adapter_channel_id INTEGER, -- Specifies adapter channel, this log belongs
-	thread_id INTEGER, -- Specifies thread, this log belongs
+	adapter_id BIGINT, -- Specifies adapter, this log belongs
+	adapter_channel_id BIGINT, -- Specifies adapter channel, this log belongs
+	thread_id BIGINT, -- Specifies thread, this log belongs
 
 	level VARCHAR(255) NOT NULL, -- INFO / DEBUG / WARN / ERROR / FATAL
 
