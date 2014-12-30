@@ -13,7 +13,7 @@ INSERT INTO adm.user_role( name, name_hum, grantby ) VALUES( 'SUPERUSER', 'Super
 INSERT INTO adm.user_role( name, name_hum, grantby ) VALUES( 'USER', 'Common user', 'ADMIN,ROOT' );
 
 CREATE TABLE adm.partner (
-	id serial,
+	id BIGSERIAL,
 
 	role_name VARCHAR(16) NOT NULL DEFAULT 'USER',
 
@@ -82,7 +82,7 @@ INSERT INTO adm.server_type( name, name_hum ) VALUES( 'DVBTS2', 'DvbTS2' );
 Used to store information about BOX where PadmeDVBTS2 running
 */
 CREATE TABLE adm.servers (
-	id serial,
+	id BIGSERIAL,
 
 	server_type VARCHAR(255) NOT NULL, -- type of server
 	partner_id INTEGER NOT NULL, -- reference to what partner this server belongs
@@ -116,7 +116,7 @@ CREATE TABLE adm.servers (
 Used to store information about settings for PadmeDVBTS2 instance
 */
 CREATE TABLE adm.server_setup (
-	id SERIAL,
+	id BIGSERIAL,
 
 	server_id INTEGER NOT NULL, -- reference to server table - what server this setup belongs
 
@@ -141,7 +141,7 @@ CREATE UNIQUE INDEX uix_server_setup ON adm.server_setup ( server_id, LOWER( set
 Used to store information about clusters and into what clusters which particular server belongs
 */
 CREATE TABLE adm.clusters (
-	id serial,
+	id BIGSERIAL,
 
 	partner_id INTEGER NOT NULL, -- reference to what partner this cluster belongs
 
@@ -165,7 +165,7 @@ CREATE TABLE adm.clusters (
 Settings for cluster, for example JMS_TYPE (ACTIVEMQ), JMS_JNDI (connection string), JMS_QUEUE (DVBTS2_ACTIVITY_MAIN), and so on.
 */
 CREATE TABLE adm.cluster_setup (
-	id SERIAL,
+	id BIGSERIAL,
 
 	cluster_id INTEGER NOT NULL, -- reference to clusters table
 
@@ -190,7 +190,7 @@ CREATE UNIQUE INDEX uix_server_setup ON adm.cluster_setup ( cluster_id, LOWER( s
 Relations between servers a clusters
 */
 CREATE TABLE adm.cluster_server_relation (
-	id SERIAL,
+	id BIGSERIAL,
 
 	cluster_id INTEGER NOT NULL, -- reference to clusters table
 	server_id INTEGER NOT NULL, -- reference to server table
@@ -217,7 +217,7 @@ CREATE SCHEMA dvbts2;
 Used to store information about channels to process, information for making thumbnails and so on
 */
 CREATE TABLE dvbts2.channels (
-	id SERIAL,
+	id BIGSERIAL,
 
 	name VARCHAR(255) NOT NULL, -- channel name e.g. CT 1
 	ident VARCHAR(255) NOT NULL, -- channel identification e.g. CT1
@@ -260,7 +260,7 @@ INSERT INTO dvbts2.adapter_type( name, name_hum ) VALUES( 'DVBS2', 'DVB-S2' );
 Used to store information about DVB T/S adapters to work with
 */
 CREATE TABLE dvbts2.adapters (
-	id SERIAL,
+	id BIGSERIAL,
 
 	server_id INTEGER NOT NULL, -- reference to server table - to what PadmeDVBTS2 instance this adapter belongs
 
@@ -298,7 +298,7 @@ CREATE TABLE dvbts2.adapters (
 Used to store information about channels to process, information for making thumbnails and so on
 */
 CREATE TABLE dvbts2.adapter_channels (
-	id SERIAL,
+	id BIGSERIAL,
 
 	channel_id INTEGER NOT NULL, -- identification to what channel this adapter channel belongs
 	adapter_id INTEGER NOT NULL, -- identification to what adapter this channel belongs
@@ -334,7 +334,7 @@ CREATE TABLE dvbts2.adapter_channels (
 Relations between adapter channels a clusters
 */
 CREATE TABLE dvbts2.cluster_adapter_channel_relation (
-	id SERIAL,
+	id BIGSERIAL,
 
 	cluster_id INTEGER NOT NULL, -- reference to clusters table
 	adapter_channel_id INTEGER NOT NULL, -- reference to adapter channel table
@@ -359,7 +359,7 @@ CREATE UNIQUE INDEX uix_cluster_adapter_channel_relation ON dvbts2.cluster_adapt
 For output streaming (live)
 */
 CREATE TABLE dvbts2.stream_forward (
-	id SERIAL,
+	id BIGSERIAL,
 
 	adapter_channel_id INTEGER, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
 	cluster_adapter_channel_relation_id INTEGER, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
@@ -401,7 +401,7 @@ CREATE TABLE dvbts2.stream_forward (
 Used to store information about programme of some channel in EPG
 */
 CREATE TABLE dvbts2.epg_programmes (
-	id SERIAL,
+	id BIGSERIAL,
 
 	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this epg program belongs
 
@@ -456,7 +456,7 @@ INSERT INTO dvbts2.lang( name, name_hum ) VALUES( 'SK', 'Sk' );
 Used to store information about programme title
 */
 CREATE TABLE dvbts2.epg_programme_title (
-	id SERIAL,
+	id BIGSERIAL,
 
 	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this title belongs
 
@@ -477,7 +477,7 @@ CREATE TABLE dvbts2.epg_programme_title (
 Used to store information about programme description
 */
 CREATE TABLE dvbts2.epg_programme_desc (
-	id SERIAL,
+	id BIGSERIAL,
 
 	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this description belongs
 
@@ -497,7 +497,7 @@ CREATE TABLE dvbts2.epg_programme_desc (
 Used to store information about programme category
 */
 CREATE TABLE dvbts2.epg_programme_category (
-	id SERIAL,
+	id BIGSERIAL,
 
 	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this category belongs
 
@@ -529,7 +529,7 @@ INSERT INTO dvbts2.credit_type( name, name_hum ) VALUES( 'PRESENTER', 'Presenter
 Used to store information about programme credits
 */
 CREATE TABLE dvbts2.epg_programme_credit (
-	id SERIAL,
+	id BIGSERIAL,
 
 	epg_programme_id INTEGER NOT NULL, -- reference to dvbts2.epg_programmes to what programme this credit belongs
 
@@ -549,7 +549,7 @@ CREATE TABLE dvbts2.epg_programme_credit (
 Used to store information about channel thumbnails
 */
 CREATE TABLE dvbts2.channel_thumbs (
-	id SERIAL,
+	id BIGSERIAL,
 
 	channel_id INTEGER NOT NULL, -- reference to dvbts2.channels to what channel this thumbnail belongs
 
@@ -570,7 +570,7 @@ CREATE TABLE dvbts2.channel_thumbs (
 For information about throughput of each channel
 */
 CREATE TABLE dvbts2.stream_throughput (
-	id SERIAL,
+	id BIGSERIAL,
 
 	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream throughput belongs
 
@@ -587,7 +587,7 @@ CREATE TABLE dvbts2.stream_throughput (
 For information about stream statistics of each channel
 */
 CREATE TABLE dvbts2.stream_statistics (
-	id SERIAL,
+	id BIGSERIAL,
 
 	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream statistics belongs
 
@@ -607,7 +607,7 @@ CREATE TABLE dvbts2.stream_statistics (
 For teletext data
 */
 CREATE TABLE dvbts2.txt_data (
-	id SERIAL,
+	id BIGSERIAL,
 
 	adapter_channel_id INTEGER NOT NULL, -- reference to dvbts2.adapter_channels to what channel this stream forward belongs
 
@@ -626,7 +626,7 @@ CREATE TABLE dvbts2.txt_data (
 Used to strore logging information what is happening in all instances of PadmeDVBTS2 in real time
 */
 CREATE TABLE dvbts2.debuglog (
-	id SERIAL,
+	id BIGSERIAL,
 
 	server_id INTEGER, -- reference to server table - what server this setup belongs
 	ident VARCHAR(255), -- Specifies PadmeDVBTS2 instance, this log belongs
