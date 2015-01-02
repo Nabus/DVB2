@@ -258,6 +258,32 @@ CREATE UNIQUE INDEX uix_cluster_server_relation ON adm.cluster_server_relation (
 CREATE SCHEMA dvbts2;
 
 /*
+Definitions for ranges of partners, by which system can recognize them and assign right clients to partners
+*/
+CREATE TABLE dvbts2.partner_ip_range (
+	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to partner (owner (company) of definition)
+	target_partner_id BIGINT NOT NULL, -- reference to partner - client
+	ip_range VARCHAR(255), -- ip like 192.168.1.0/24, or ip addresses separated by column
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_partner_ip_range PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_ip_range_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id),
+	CONSTRAINT fk_partner_ip_range_target_partner_id FOREIGN KEY (target_partner_id) REFERENCES adm.partner (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_ip_range ON dvbts2.partner_ip_range ( partner_id, target_partner_id, lower(ip_range) );
+
+/*
 Used to store information about channels to process, information for making thumbnails and so on
 */
 CREATE TABLE dvbts2.channels (
