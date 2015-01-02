@@ -47,7 +47,7 @@ CREATE TABLE adm.partner (
 	city CHARACTER VARYING(128),
 	postal CHARACTER VARYING(16),
 
--- invoicing address
+	-- invoicing address
 	iv_address VARCHAR(255),
 	iv_street VARCHAR(255),
 	iv_street_nr CHARACTER VARYING(16),
@@ -69,6 +69,50 @@ CREATE TABLE adm.partner (
 );
 
 CREATE UNIQUE INDEX uix_partner_username ON adm.partner ( LOWER( username ) );
+
+-- group of partners
+CREATE TABLE adm.partner_group (
+	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to partner table - to what partner this row belongs
+
+	group_name VARCHAR(255) NOT NULL, -- Group name
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	date_changed TIMESTAMP, -- When somebody change any detail
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+
+	CONSTRAINT pk_partner_group PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_group_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_group ON adm.partner_group ( partner_id, LOWER( group_name ) );
+
+-- what partner belongs to which group
+CREATE TABLE adm.partner_group_partner_relation (
+	id BIGSERIAL,
+
+	partner_group_id BIGINT NOT NULL, -- reference to partner_group
+	partner_id BIGINT NOT NULL, -- reference to partner
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	date_changed TIMESTAMP, -- When somebody change any detail
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(),
+
+	CONSTRAINT pk_partner_group_partner_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_group_partner_relation_partner_group_id FOREIGN KEY (partner_group_id) REFERENCES adm.partner_group (id),
+	CONSTRAINT fk_partner_group_partner_relation_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_group_partner_relation ON adm.partner_group_partner_relation ( partner_group_id, partner_id );
 
 CREATE TABLE adm.server_type (
 	name VARCHAR(255) NOT NULL, -- Server type name
@@ -219,6 +263,8 @@ Used to store information about channels to process, information for making thum
 CREATE TABLE dvbts2.channels (
 	id BIGSERIAL,
 
+	partner_id BIGINT NOT NULL, -- reference to what partner this channel belongs
+
 	name VARCHAR(255) NOT NULL, -- channel name e.g. CT 1
 	ident VARCHAR(255) NOT NULL, -- channel identification e.g. CT1
 
@@ -242,8 +288,160 @@ CREATE TABLE dvbts2.channels (
 	note TEXT, -- Some useful information to Admin eyes only
 	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
 
-	CONSTRAINT pk_channels PRIMARY KEY ( id )
+	CONSTRAINT pk_channels PRIMARY KEY ( id ),
+	CONSTRAINT fk_channels_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id)
 );
+
+/*
+Used to store information about channel packages
+*/
+CREATE TABLE dvbts2.channel_packages (
+	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to what partner this channel package belongs
+
+	name VARCHAR(255) NOT NULL, -- channel package name e.g. Standard DVB channels
+	ident VARCHAR(255) NOT NULL, -- channel package identification e.g. STANDARD
+
+	icon TEXT,
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true, 0 = false, determine whenever this channel is active and it has to be processed, false = deleted and not active
+
+	-- new added field for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_channel_packages PRIMARY KEY ( id ),
+	CONSTRAINT fk_channel_packages_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id)
+);
+
+/*
+Relations between channels and channel packages
+*/
+CREATE TABLE dvbts2.channel_channel_packages_relation (
+	id BIGSERIAL,
+
+	channel_id BIGINT NOT NULL, -- reference to channel table
+	channel_package_id BIGINT NOT NULL, -- reference to channel package table
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_channel_channel_packages_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_channel_channel_packages_relation_channel_id FOREIGN KEY (channel_id) REFERENCES dvbts2.channels (id),
+	CONSTRAINT fk_channel_channel_packages_relation_channel_package_id FOREIGN KEY (channel_package_id) REFERENCES dvbts2.channel_packages (id)
+);
+
+CREATE UNIQUE INDEX uix_channel_channel_packages_relation ON dvbts2.channel_channel_packages_relation ( active, channel_id, channel_package_id );
+
+/*
+Relations between partners and channels
+*/
+CREATE TABLE dvbts2.partner_channel_relation (
+	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to what partner this channel package belongs
+	channel_id BIGINT NOT NULL, -- reference to channel table
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_partner_channel_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_channel_relation_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id),
+	CONSTRAINT fk_partner_channel_relation_channel_id FOREIGN KEY (channel_id) REFERENCES dvbts2.channels (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_channel_relation ON dvbts2.partner_channel_relation ( active, partner_id, channel_id );
+
+/*
+Relations between partners and packages channels
+*/
+CREATE TABLE dvbts2.partner_channel_packages_relation (
+	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to what partner this channel package belongs
+	channel_package_id BIGINT NOT NULL, -- reference to channel package table
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_partner_channel_packages_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_channel_packages_relation_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id),
+	CONSTRAINT fk_partner_channel_packages_relation_channel_package_id FOREIGN KEY (channel_package_id) REFERENCES dvbts2.channel_packages (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_channel_packages_relation ON dvbts2.partner_channel_packages_relation ( active, partner_id, channel_package_id );
+
+/*
+Relations between partner_groups and channels
+*/
+CREATE TABLE dvbts2.partner_group_channel_relation (
+	id BIGSERIAL,
+
+	partner_group_id BIGINT NOT NULL, -- reference to what partner_group this channel package belongs
+	channel_id BIGINT NOT NULL, -- reference to channel table
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_partner_group_channel_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_group_channel_relation_partner_group_id FOREIGN KEY (partner_group_id) REFERENCES adm.partner_group (id),
+	CONSTRAINT fk_partner_group_channel_relation_channel_id FOREIGN KEY (channel_id) REFERENCES dvbts2.channels (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_group_channel_relation ON dvbts2.partner_group_channel_relation ( active, partner_group_id, channel_id );
+
+/*
+Relations between partner_groups and packages channels
+*/
+CREATE TABLE dvbts2.partner_group_channel_packages_relation (
+	id BIGSERIAL,
+
+	partner_group_id BIGINT NOT NULL, -- reference to what partner_group this channel package belongs
+	channel_package_id BIGINT NOT NULL, -- reference to channel package table
+
+	active INTEGER NOT NULL DEFAULT 1, -- 1 = true = row is active, 0 = false, determine whenever record is active and available, false = deleted and not active
+
+	-- fields for administration
+	date_changed TIMESTAMP, -- When somebody change anything, timestamp is set
+	user_changed VARCHAR(128), -- Same as in previous case, any change is registered - who done that change
+
+	note TEXT, -- Some useful information to Admin eyes only
+	date_created TIMESTAMP NOT NULL DEFAULT NOW(), -- whenever this record was created
+
+	CONSTRAINT pk_partner_group_channel_packages_relation PRIMARY KEY ( id ),
+	CONSTRAINT fk_partner_group_channel_packages_relation_partner_group_id FOREIGN KEY (partner_group_id) REFERENCES adm.partner_group (id),
+	CONSTRAINT fk_partner_group_channel_packages_relation_channel_package_id FOREIGN KEY (channel_package_id) REFERENCES dvbts2.channel_packages (id)
+);
+
+CREATE UNIQUE INDEX uix_partner_group_channel_packages_relation ON dvbts2.partner_group_channel_packages_relation ( active, partner_group_id, channel_package_id );
 
 CREATE TABLE dvbts2.adapter_type (
 	name VARCHAR(255) NOT NULL, -- Adapter type name
@@ -261,6 +459,8 @@ Used to store information about DVB T/S adapters to work with
 */
 CREATE TABLE dvbts2.adapters (
 	id BIGSERIAL,
+
+	partner_id BIGINT NOT NULL, -- reference to what partner this adapter belongs
 
 	server_id BIGINT NOT NULL, -- reference to server table - to what PadmeDVBTS2 instance this adapter belongs
 
@@ -291,7 +491,8 @@ CREATE TABLE dvbts2.adapters (
 
 	CONSTRAINT pk_adapters PRIMARY KEY ( id ),
 	CONSTRAINT fk_adapters_adapter_type FOREIGN KEY (adapter_type) REFERENCES dvbts2.adapter_type (name),
-	CONSTRAINT fk_adapters_server_id FOREIGN KEY (server_id) REFERENCES adm.servers (id)
+	CONSTRAINT fk_adapters_server_id FOREIGN KEY (server_id) REFERENCES adm.servers (id),
+	CONSTRAINT fk_adapters_partner_id FOREIGN KEY (partner_id) REFERENCES adm.partner (id)
 );
 
 /*
