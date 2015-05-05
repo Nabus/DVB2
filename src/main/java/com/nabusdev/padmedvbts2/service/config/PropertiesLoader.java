@@ -11,8 +11,9 @@ public class PropertiesLoader extends ConfigLoader {
     private static final String SUFFIX = ".properties";
 
     public static void load(String configPath) {
-        Properties properties = new Properties();
-        try (InputStream inputStream = new FileInputStream(PREFIX + configPath + SUFFIX)){
+        try {
+            Properties properties = new Properties();
+            InputStream inputStream = PropertiesLoader.class.getClassLoader().getResourceAsStream(configPath + SUFFIX);
             properties.load(inputStream);
             for (Object objectKey : properties.keySet()) {
                 String key = (String) objectKey;
